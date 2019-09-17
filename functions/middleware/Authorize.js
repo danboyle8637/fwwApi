@@ -1,0 +1,26 @@
+const auth = require('../utils/admin').auth
+
+exports.Authorize = (req, res, next) => {
+  const authorization = req.headers.authorization
+  const tokenPresent = req.headers.authorization.startsWith('Bearer ')
+
+  let tokenId
+
+  if (authorization && tokenPresent) {
+    tokenId = req.headers.authorization.split('Bearer ').pop()
+
+    auth
+      .verifyIdToken(tokenId)
+      .then(decodedToken => {
+        req.user = decodedToken
+        return next()
+      })
+      .catch(error => {
+        return res
+          .status(403)
+          .json({ error: 'You did not pass authorization.' })
+      })
+  } else {
+    return res.status(403).json({ error: 'You are not authorized.' })
+  }
+}
