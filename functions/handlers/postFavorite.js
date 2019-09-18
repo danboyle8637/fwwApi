@@ -1,6 +1,6 @@
 const db = require('../utils/admin').db
 
-exports.toggleIsFavorite = (req, res) => {
+exports.postFavorite = (req, res) => {
   const request = {
     programId: req.body.programId,
     workoutId: req.body.workoutId,

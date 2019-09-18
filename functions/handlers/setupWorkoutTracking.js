@@ -45,33 +45,54 @@ exports.setupWorkoutTracking = (req, res) => {
       const workoutId = workout.workoutId
       const workoutName = workout.name
 
+      // const workoutDocData = {
+      //   programId: programId,
+      //   workoutId: workoutId,
+      //   name: workoutName,
+      //   completed: {
+      //     complete1: {
+      //       id: 1,
+      //       value: 'complete1',
+      //       isComplete: false
+      //     },
+      //     complete2: {
+      //       id: 2,
+      //       value: 'complete2',
+      //       isComplete: false
+      //     },
+      //     complete3: {
+      //       id: 3,
+      //       value: 'complete3',
+      //       isComplete: false
+      //     }
+      //   },
+      //   trackingStats: {
+      //     first: {},
+      //     second: {},
+      //     third: {}
+      //   },
+      //   isFavorite: false
+      // }
+
       const workoutDocData = {
-        programId: programId,
-        workoutId: workoutId,
-        name: workoutName,
-        completed: {
+        workoutId: {
+          programId: programId,
+          workoutId: workoutId,
+          name: workoutName,
           complete1: {
-            id: 1,
-            value: 'complete1',
             isComplete: false
           },
           complete2: {
-            id: 2,
-            value: 'complete2',
             isComplete: false
           },
           complete3: {
-            id: 3,
-            value: 'complete3',
             isComplete: false
-          }
-        },
-        trackingStats: {
-          first: {},
-          second: {},
-          third: {}
-        },
-        isFavorite: false
+          },
+          trackingStats1: {},
+          trackingStats2: {},
+          trackingStats3: {},
+          isFavorite: false
+        }
       }
 
       return db
@@ -107,6 +128,7 @@ exports.setupWorkoutTracking = (req, res) => {
           docsArray.push(doc.data())
         })
 
+        // How we get rid of the percentComplete document
         const statsWorkoutArray = docsArray.filter(element => {
           return element.totalWorkouts !== 5
         })

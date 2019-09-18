@@ -24,11 +24,11 @@ exports.postWorkoutNumbers = (req, res) => {
     .get()
     .then(docSnapshot => {
       const data = docSnapshot.data()
-      if (Object.keys(data.trackingGoal.first).length === 0) {
+      if (Object.keys(data.trackingStats.first).length === 0) {
         saveFirstNumber()
-      } else if (Object.keys(data.trackingGoal.second).length === 0) {
+      } else if (Object.keys(data.trackingStats.second).length === 0) {
         saveSecondNumber()
-      } else if (Object.keys(data.trackingGoal.third).length === 0) {
+      } else if (Object.keys(data.trackingStats.third).length === 0) {
         saveThirdNumber()
       } else {
         res.status(200).json({
@@ -45,17 +45,10 @@ exports.postWorkoutNumbers = (req, res) => {
 
   const saveFirstNumber = () => {
     stats
-      .set(
-        {
-          trackingGoal: {
-            first: {
-              number: number,
-              timestamp: timestamp
-            }
-          }
-        },
-        { merge: true }
-      )
+      .update({
+        'trackingStats.first.number': number,
+        'trackingStats.first.timestamp': timestamp
+      })
       .then(() => {
         res.status(200).json({
           message: `Successfully saved your result... ${number}`
@@ -71,17 +64,10 @@ exports.postWorkoutNumbers = (req, res) => {
 
   const saveSecondNumber = () => {
     stats
-      .set(
-        {
-          trackingGoal: {
-            second: {
-              number: number,
-              timestamp: timestamp
-            }
-          }
-        },
-        { merge: true }
-      )
+      .update({
+        'trackingStats.second.number': number,
+        'trackingStats.second.timestamp': timestamp
+      })
       .then(() => {
         res.status(200).json({
           message: `Successfully saved your result... ${number}`
@@ -97,17 +83,10 @@ exports.postWorkoutNumbers = (req, res) => {
 
   const saveThirdNumber = () => {
     stats
-      .set(
-        {
-          trackingGoal: {
-            third: {
-              number: number,
-              timestamp: timestamp
-            }
-          }
-        },
-        { merge: true }
-      )
+      .update({
+        'trackingStats.third.number': number,
+        'trackingStats.third.timestamp': timestamp
+      })
       .then(() => {
         res.status(200).json({
           message: `Successfully saved your result... ${number}`
