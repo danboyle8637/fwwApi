@@ -45,54 +45,42 @@ exports.setupWorkoutTracking = (req, res) => {
       const workoutId = workout.workoutId
       const workoutName = workout.name
 
-      // const workoutDocData = {
-      //   programId: programId,
-      //   workoutId: workoutId,
-      //   name: workoutName,
-      //   completed: {
-      //     complete1: {
-      //       id: 1,
-      //       value: 'complete1',
-      //       isComplete: false
-      //     },
-      //     complete2: {
-      //       id: 2,
-      //       value: 'complete2',
-      //       isComplete: false
-      //     },
-      //     complete3: {
-      //       id: 3,
-      //       value: 'complete3',
-      //       isComplete: false
-      //     }
-      //   },
-      //   trackingStats: {
-      //     first: {},
-      //     second: {},
-      //     third: {}
-      //   },
-      //   isFavorite: false
-      // }
-
       const workoutDocData = {
-        workoutId: {
-          programId: programId,
-          workoutId: workoutId,
-          name: workoutName,
+        programId: programId,
+        workoutId: workoutId,
+        name: workoutName,
+        completed: {
           complete1: {
+            id: 1,
+            value: 'complete1',
             isComplete: false
           },
           complete2: {
+            id: 2,
+            value: 'complete2',
             isComplete: false
           },
           complete3: {
+            id: 3,
+            value: 'complete3',
             isComplete: false
+          }
+        },
+        trackingStats: {
+          first: {
+            number: null,
+            timestamp: null
           },
-          trackingStats1: {},
-          trackingStats2: {},
-          trackingStats3: {},
-          isFavorite: false
-        }
+          second: {
+            number: null,
+            timestamp: null
+          },
+          third: {
+            number: null,
+            timestamp: null
+          }
+        },
+        isFavorite: false
       }
 
       return db
@@ -105,9 +93,10 @@ exports.setupWorkoutTracking = (req, res) => {
 
     Promise.all(workoutDocPromises)
       .then(() => {
-        return res.status(200).json({
-          message: 'Successfully created workout documents'
-        })
+        sendBackWorkoutTracking()
+        // return res.status(200).json({
+        //   message: 'Successfully created workout documents'
+        // })
       })
       .catch(error => {
         return res.status(404).json({
@@ -133,9 +122,43 @@ exports.setupWorkoutTracking = (req, res) => {
           return element.totalWorkouts !== 5
         })
 
+        // TODO You need to decide how you want the dats in client state to be
+        // That is what you will construct here and send back
+
+        const stats = statsWorkoutArray.reduce((accumulator, currentValue) => {
+          const complete1 = currentValue.completed.complete1
+          const complete2 = currentValue.completed.complete2
+          const complete3 = currentValue.completed.complete3
+
+          const first = currentValue.trackingStats.first
+          const second = currentValue.trackingStats.second
+          const third = currentValue.trackingStats.third
+
+          const workoutId = currentValue.workoutId
+
+          accumulator[workoutId] = {
+            completed: {
+              complete1,
+              complete2,
+              complete3
+            },
+            trackingStats: {
+              first,
+              second,
+              third
+            },
+            isFavorite: currentValue.isFavorite,
+            name: currentValue.name,
+            programId: currentValue.programId,
+            workoutId: currentValue.workoutId
+          }
+
+          return accumulator
+        }, {})
+
         res.status(200).json({
           message: 'Stats successfully retrieved',
-          stats: statsWorkoutArray
+          stats: stats
         })
       })
       .catch(error => {

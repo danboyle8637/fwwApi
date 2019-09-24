@@ -156,13 +156,15 @@ exports.signUp = (req, res) => {
       })
       .then(() => {
         // Step 7: Return the new user and get them to the dashboard.
-        console.log('Should return my successful data')
+        const programArray = []
+        programArray.push(cleanUserInfo.program)
+
         return res.status(201).json({
           success: `New user ${userId} successfully created and saved.`,
           firstName: cleanUserInfo.firstName,
           username: cleanUserInfo.username,
           photoUrl: baseAvatarImage,
-          program: cleanUserInfo.program
+          programs: programArray
         })
       })
       .catch(error => {
