@@ -1,10 +1,12 @@
 const db = require('../utils/admin').db
 
 exports.postFavorite = (req, res) => {
+  const data = JSON.parse(req.body)
+
   const request = {
-    programId: req.body.programId,
-    workoutId: req.body.workoutId,
-    username: req.body.username
+    programId: data.programId,
+    workoutId: data.workoutId,
+    username: data.username
   }
 
   const programId = request.programId
@@ -33,18 +35,16 @@ exports.postFavorite = (req, res) => {
           )
           .then(() => {
             return res.status(200).json({
-              message: 'This workout has been marked as a favorite of yours.'
+              message: 'Awesome! 💕'
             })
           })
           .catch(error => {
             return res.status(400).json({
-              message:
-                'Could not save this workout as a favorite. Try again below...',
+              message: 'Error 😭',
               error: error
             })
           })
       }
-
       if (isFavorite) {
         workout
           .set(
@@ -55,12 +55,12 @@ exports.postFavorite = (req, res) => {
           )
           .then(() => {
             return res.status(200).json({
-              message: `What!?!?! You don't like this workout anymore? Okay... it's not longer a favorite.`
+              message: `Sad but done. 😢`
             })
           })
           .catch(error => {
             return res.status(400).json({
-              message: `Could not reverse your favorite. Sheesh... but try again below.`,
+              message: 'Error 😭',
               error: error
             })
           })

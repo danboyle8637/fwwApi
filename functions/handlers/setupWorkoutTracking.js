@@ -94,9 +94,6 @@ exports.setupWorkoutTracking = (req, res) => {
     Promise.all(workoutDocPromises)
       .then(() => {
         sendBackWorkoutTracking()
-        // return res.status(200).json({
-        //   message: 'Successfully created workout documents'
-        // })
       })
       .catch(error => {
         return res.status(404).json({
@@ -115,6 +112,10 @@ exports.setupWorkoutTracking = (req, res) => {
         let docsArray = []
         docsSnapshot.forEach(doc => {
           docsArray.push(doc.data())
+        })
+
+        const percentComplete = docsArray.filter(element => {
+          return element.title === 'PercentComplete'
         })
 
         // How we get rid of the percentComplete document
@@ -158,6 +159,7 @@ exports.setupWorkoutTracking = (req, res) => {
 
         res.status(200).json({
           message: 'Stats successfully retrieved',
+          percentComplete: percentComplete,
           stats: stats
         })
       })

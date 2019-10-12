@@ -144,7 +144,8 @@ exports.signUp = (req, res) => {
         const percentComplete = {
           workoutsCompleted: 0,
           totalWorkouts: cleanUserInfo.totalWorkouts,
-          programId: cleanUserInfo.program
+          programId: cleanUserInfo.program,
+          title: 'PercentComplete'
         }
 
         return db

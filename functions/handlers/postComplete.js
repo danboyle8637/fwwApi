@@ -1,11 +1,13 @@
 const db = require('../utils/admin').db
 
 exports.postComplete = (req, res) => {
+  const data = JSON.parse(req.body)
+
   const request = {
-    username: req.body.username,
-    programId: req.body.programId,
-    workoutId: req.body.workoutId,
-    completeId: req.body.completeId
+    username: data.username,
+    programId: data.programId,
+    workoutId: data.workoutId,
+    completeId: data.completeId
   }
 
   const username = request.username
@@ -24,11 +26,11 @@ exports.postComplete = (req, res) => {
     .then(docSnapshot => {
       const data = docSnapshot.data()
 
-      const name = data.name
       const completed1 = data.completed.complete1.isComplete
       const completed2 = data.completed.complete2.isComplete
 
-      if (completeId === 'complete1') {
+      // Should be if(!completed1) {Do updates}
+      if (completeId === 1) {
         console.log('Should be updating only Complete1')
         workoutStats
           .update({
@@ -37,18 +39,17 @@ exports.postComplete = (req, res) => {
           })
           .then(() => {
             res.status(200).json({
-              message: `Congrats on completing ${name} for the first time!`
+              message: `Success 💪`
             })
           })
           .catch(error => {
             res.status(400).json({
-              message: `Could not mark as complete. Close window and try again.`,
+              message: 'Error 😭',
               error: error
             })
           })
       }
-
-      if (completeId === 'complete2' && completed1) {
+      if (completeId === 2 && completed1) {
         console.log('Should be updating only Complete2')
         workoutStats
           .update({
@@ -57,18 +58,17 @@ exports.postComplete = (req, res) => {
           })
           .then(() => {
             res.status(200).json({
-              message: `Congrats on completing ${name} for the second time!`
+              message: `Success 💪`
             })
           })
           .catch(error => {
             res.status(400).json({
-              message: `You need to complete the workout before you can complete it again.`,
+              message: 'Error 😭',
               error: error
             })
           })
       }
-
-      if (completeId === 'complete3' && completed2) {
+      if (completeId === 3 && completed2) {
         console.log('Should be updating only Complete3')
         workoutStats
           .update({
@@ -77,12 +77,12 @@ exports.postComplete = (req, res) => {
           })
           .then(() => {
             res.status(200).json({
-              message: `Congrats on completing ${name} for the final time!`
+              message: `Success 💪`
             })
           })
           .catch(error => {
             res.status(400).json({
-              message: `You need to complete the workout before you can complete it a second time.`,
+              message: 'Error 😭',
               error: error
             })
           })

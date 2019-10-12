@@ -7,8 +7,10 @@ exports.getUser = (req, res) => {
     username: data.username
   }
 
+  const username = userData.username
+
   db.collection('users')
-    .doc(userData.username)
+    .doc(username)
     .get()
     .then(userDoc => {
       const userData = userDoc.data()

@@ -5,11 +5,11 @@ exports.getPercentComplete = (req, res) => {
   // You need to get the progress for each program in the array
   // Even if it's only one program in the array
 
-  const data = JSON.parse(req.body)
+  // const data = JSON.parse(req.body)
 
   const request = {
-    username: data.username,
-    programs: data.programs
+    username: req.body.username,
+    programs: req.body.programs
   }
 
   const username = request.username
@@ -20,6 +20,7 @@ exports.getPercentComplete = (req, res) => {
       .collection('users')
       .doc(username)
       .collection(program)
+      .doc('PercentComplete')
       .get()
   })
 
@@ -28,16 +29,14 @@ exports.getPercentComplete = (req, res) => {
       const percentCompleteArray = []
 
       docSnapshotArray.forEach(docSnapshot => {
-        docSnapshot.forEach(doc => {
-          const docData = doc.data()
-          const totalWorkouts = docData.totalWorkouts
-          const workoutsCompleted = docData.workoutsCompleted
-          const programId = docData.programId
-          const percent = Math.round((workoutsCompleted / totalWorkouts) * 100)
-          const percentData = { programId: programId, percentage: percent }
+        const docData = docSnapshot.data()
+        const totalWorkouts = docData.totalWorkouts
+        const workoutsCompleted = docData.workoutsCompleted
+        const programId = docData.programId
+        const percent = Math.round((workoutsCompleted / totalWorkouts) * 100)
+        const percentData = { programId: programId, percentage: percent }
 
-          percentCompleteArray.push(percentData)
-        })
+        percentCompleteArray.push(percentData)
       })
 
       return res.status(200).json({
