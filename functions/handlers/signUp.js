@@ -11,18 +11,19 @@ const {
 } = require('../utils/formatValidate')
 
 exports.signUp = (req, res) => {
-  const data = JSON.parse(req.body)
+  //   const data = JSON.parse(req.body)
 
   // The req object body with user info.
   const userInfo = {
-    userId: data.userId,
-    program: data.program,
-    totalWorkouts: data.totalWorkouts,
-    firstName: data.firstName,
-    username: data.username,
-    password: data.password,
-    confirmPassword: data.confirmPassword,
-    email: data.email
+    userId: req.body.userId,
+    programId: req.body.programId,
+    totalWorkouts: req.body.totalWorkouts,
+    firstName: req.body.firstName,
+    username: req.body.username,
+    password: req.body.password,
+    confirmPassword: req.body.confirmPassword,
+    email: req.body.email,
+    biggestObstacle: req.body.biggestObstacle
   }
 
   // Format and validate userInfo
@@ -30,6 +31,7 @@ exports.signUp = (req, res) => {
 
   const isFirstNameEmpty = checkIsEmpty(userInfo.firstName)
   const isPasswordEmpty = checkIsEmpty(userInfo.password)
+  const isBiggestObstacleEmpty = checkIsEmpty(userInfo.biggestObstacle)
   const isEmailValid = checkIsEmail(userInfo.email)
   const passwordsEqual = confirmPasswordsEqual(
     userInfo.password,
@@ -39,23 +41,27 @@ exports.signUp = (req, res) => {
   const formattedUsername = cleanAndCheckUsername(userInfo.username)
 
   if (isFirstNameEmpty) {
-    errors.firstName = 'Please enter your first name.'
+    errors.firstName = 'Enter your first name.'
   }
 
   if (formattedUsername === false) {
-    errors.username = 'Please check your username.'
+    errors.username = 'Check your username.'
   }
 
   if (isPasswordEmpty) {
-    errors.password = 'Please create a password.'
+    errors.password = 'Create a password.'
   }
 
   if (!isEmailValid) {
-    errors.email = 'Please enter a valid email address.'
+    errors.email = 'Enter valid email address.'
   }
 
   if (!passwordsEqual) {
     errors.passwordsEqual = "Passwords don't match. Try again."
+  }
+
+  if (isBiggestObstacleEmpty) {
+    errors.biggestObstacle = 'Select a biggest obstacle.'
   }
 
   if (Object.keys(errors).length > 0) {
@@ -67,12 +73,13 @@ exports.signUp = (req, res) => {
 
   const cleanUserInfo = {
     userId: userInfo.userId,
-    program: userInfo.program,
-    totalWorkouts: data.totalWorkouts,
+    programId: userInfo.programId,
+    totalWorkouts: userInfo.totalWorkouts,
     firstName: formattedFirstName,
     username: formattedUsername,
     password: userInfo.password,
-    email: userInfo.email.toLowerCase()
+    email: userInfo.email.toLowerCase(),
+    biggestObstacle: userInfo.biggestObstacle
   }
 
   // Step 1: Get newly created user
@@ -88,11 +95,11 @@ exports.signUp = (req, res) => {
         if (userDoc.exists) {
           // the username already exists. Return error.
           return res.status(400).json({
-            error: `Username, ${cleanUserInfo.username}, already exists. Try a different version or create a new one.`
+            error: `Username, ${cleanUserInfo.username}, already exists. Try a different one or create a new one.`
           })
         } else {
           // Step 3: Updating user with cleaned and formatted data.
-
+          // This is going into the user in Authentication
           return auth.updateUser(userId, {
             email: cleanUserInfo.email,
             password: cleanUserInfo.password,
@@ -103,10 +110,22 @@ exports.signUp = (req, res) => {
       })
       .then(() => {
         // Step 4: Set customClaims on user to use with site access.
+        let isFree
+
+        if (
+          cleanUserInfo.programId === '7DayIgniteReset' ||
+          cleanUserInfo.programId === '7DayBodyBurnReset' ||
+          cleanUserInfo.programId === '7DayStrongReset'
+        ) {
+          isFree = true
+        } else {
+          isFree = false
+        }
+
         auth
           .setCustomUserClaims(userId, {
-            program: [cleanUserInfo.program],
-            free: true
+            programId: [cleanUserInfo.programId],
+            free: isFree
           })
           .then(() => {
             console.log('Custom claim created.')
@@ -118,8 +137,9 @@ exports.signUp = (req, res) => {
           userId: userId,
           firstName: cleanUserInfo.firstName,
           username: cleanUserInfo.username,
-          programs: [cleanUserInfo.program],
-          createdAt: new Date().toISOString()
+          programs: [cleanUserInfo.programId],
+          biggestObstacle: cleanUserInfo.biggestObstacle,
+          createdAt: new Date().toLocaleDateString()
         }
 
         return db
@@ -144,24 +164,24 @@ exports.signUp = (req, res) => {
         const percentComplete = {
           workoutsCompleted: 0,
           totalWorkouts: cleanUserInfo.totalWorkouts,
-          programId: cleanUserInfo.program,
+          programId: cleanUserInfo.programId,
           title: 'PercentComplete'
         }
 
         return db
           .collection('users')
           .doc(cleanUserInfo.username)
-          .collection(cleanUserInfo.program)
-          .doc('PercentComplete')
+          .collection('Programs')
+          .doc(cleanUserInfo.programId)
           .set(percentComplete)
       })
       .then(() => {
         // Step 7: Return the new user and get them to the dashboard.
         const programArray = []
-        programArray.push(cleanUserInfo.program)
+        programArray.push(cleanUserInfo.programId)
 
         return res.status(201).json({
-          success: `New user ${userId} successfully created and saved.`,
+          success: `💪 Account created. Congrats!`,
           firstName: cleanUserInfo.firstName,
           username: cleanUserInfo.username,
           photoUrl: baseAvatarImage,
@@ -169,8 +189,11 @@ exports.signUp = (req, res) => {
         })
       })
       .catch(error => {
-        console.log('Error is firing for some reason')
-        return res.status(500).json({ error: error })
+        console.log('Error signing up. Try again.')
+        return res.status(500).json({
+          message: 'Error signing up. Try again.',
+          error: error
+        })
       })
   })
 }

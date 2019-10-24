@@ -1,12 +1,12 @@
 const db = require('../utils/admin').db
 
 exports.postFavorite = (req, res) => {
-  const data = JSON.parse(req.body)
+  //const data = JSON.parse(req.body)
 
   const request = {
-    programId: data.programId,
-    workoutId: data.workoutId,
-    username: data.username
+    programId: req.body.programId,
+    workoutId: req.body.workoutId,
+    username: req.body.username
   }
 
   const programId = request.programId
@@ -16,7 +16,9 @@ exports.postFavorite = (req, res) => {
   const workout = db
     .collection('users')
     .doc(username)
-    .collection(programId)
+    .collection('Programs')
+    .doc(programId)
+    .collection('Workouts')
     .doc(workoutId)
 
   workout

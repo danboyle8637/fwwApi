@@ -18,11 +18,12 @@ exports.getWorkouts = (req, res) => {
       let workoutsArray = []
 
       workoutDocs.forEach(workoutDoc => {
-        workoutsArray.push(workoutDoc.data())
+        const workoutData = workoutDoc.data()
+        workoutsArray.push(workoutData)
       })
 
       res.status(200).json({
-        message: 'Workout successfully retrieved.',
+        message: 'Workouts retrieved.',
         workouts: workoutsArray
       })
     })

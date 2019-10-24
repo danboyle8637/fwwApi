@@ -1,13 +1,13 @@
 const db = require('../utils/admin').db
 
 exports.postComplete = (req, res) => {
-  const data = JSON.parse(req.body)
+  //const data = JSON.parse(req.body)
 
   const request = {
-    username: data.username,
-    programId: data.programId,
-    workoutId: data.workoutId,
-    completeId: data.completeId
+    username: req.body.username,
+    programId: req.body.programId,
+    workoutId: req.body.workoutId,
+    completeId: req.body.completeId
   }
 
   const username = request.username
@@ -18,7 +18,9 @@ exports.postComplete = (req, res) => {
   const workoutStats = db
     .collection('users')
     .doc(username)
-    .collection(programId)
+    .collection('Programs')
+    .doc(programId)
+    .collection('Workouts')
     .doc(workoutId)
 
   workoutStats
@@ -35,7 +37,7 @@ exports.postComplete = (req, res) => {
         workoutStats
           .update({
             'completed.complete1.isComplete': true,
-            'completed.complete1.timestamp': new Date().toISOString()
+            'completed.complete1.timestamp': new Date().toLocaleDateString()
           })
           .then(() => {
             res.status(200).json({
@@ -54,7 +56,7 @@ exports.postComplete = (req, res) => {
         workoutStats
           .update({
             'completed.complete2.isComplete': true,
-            'completed.complete2.timestamp': new Date().toISOString()
+            'completed.complete2.timestamp': new Date().toLocaleDateString()
           })
           .then(() => {
             res.status(200).json({
@@ -67,13 +69,17 @@ exports.postComplete = (req, res) => {
               error: error
             })
           })
+      } else if (completeId === 2 && !completed1) {
+        return res.status(400).json({
+          message: 'Complete first time first!'
+        })
       }
       if (completeId === 3 && completed2) {
         console.log('Should be updating only Complete3')
         workoutStats
           .update({
             'completed.complete3.isComplete': true,
-            'completed.complete3.timestamp': new Date().toISOString()
+            'completed.complete3.timestamp': new Date().toLocaleDateString()
           })
           .then(() => {
             res.status(200).json({
@@ -86,6 +92,10 @@ exports.postComplete = (req, res) => {
               error: error
             })
           })
+      } else if (completeId === 3 && !completed2) {
+        return res.status(400).json({
+          message: 'Complete second time first!'
+        })
       }
     })
     .catch(error => {

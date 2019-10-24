@@ -1,14 +1,14 @@
 const db = require('../utils/admin').db
 
 exports.postWorkoutNumbers = (req, res) => {
-  const data = JSON.parse(req.body)
+  //const data = JSON.parse(req.body)
 
   const request = {
-    username: data.username,
-    programId: data.programId,
-    workoutId: data.workoutId,
-    number: data.number,
-    date: data.date
+    username: req.body.username,
+    programId: req.body.programId,
+    workoutId: req.body.workoutId,
+    number: req.body.number,
+    date: req.body.date
   }
 
   const username = request.username
@@ -18,16 +18,12 @@ exports.postWorkoutNumbers = (req, res) => {
   const date = request.date
   const timestamp = new Date()
 
-  /* 
-    TODO - If you mark a workout complete without tracking a number.
-    Then you go back and track the workout, it does not mark the 
-    workout complete for the second or third time. But it should.
-  */
-
   const stats = db
     .collection('users')
     .doc(username)
-    .collection(programId)
+    .collection('Programs')
+    .doc(programId)
+    .collection('Workouts')
     .doc(workoutId)
 
   stats
@@ -35,17 +31,17 @@ exports.postWorkoutNumbers = (req, res) => {
     .then(docSnapshot => {
       const data = docSnapshot.data()
       if (
-        Object.keys(data.trackingStats.first).length === 0 ||
+        Object.keys(data.trackingStats).length === 0 ||
         data.trackingStats.first.number === null
       ) {
         saveFirstNumber()
       } else if (
-        Object.keys(data.trackingStats.second).length === 0 ||
+        !Object.keys(data.trackingStats).includes('second') ||
         data.trackingStats.second.number === null
       ) {
         saveSecondNumber()
       } else if (
-        Object.keys(data.trackingStats.third).length === 0 ||
+        !Object.keys(data.trackingStats).includes('third') ||
         data.trackingStats.third.number === null
       ) {
         saveThirdNumber()
@@ -73,7 +69,7 @@ exports.postWorkoutNumbers = (req, res) => {
       })
       .then(() => {
         res.status(200).json({
-          message: `Success 😀`
+          message: `Success 💪`
         })
       })
       .catch(error => {
@@ -94,7 +90,7 @@ exports.postWorkoutNumbers = (req, res) => {
       })
       .then(() => {
         res.status(200).json({
-          message: `Success 😀`
+          message: `Success 💪`
         })
       })
       .catch(error => {
@@ -115,7 +111,7 @@ exports.postWorkoutNumbers = (req, res) => {
       })
       .then(() => {
         res.status(200).json({
-          message: `Success 😀`
+          message: `Success 💪`
         })
       })
       .catch(error => {

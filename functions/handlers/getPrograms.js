@@ -4,25 +4,37 @@ const db = require('../utils/admin').db
 // It also lets me put them in the right order
 
 exports.getPrograms = (req, res) => {
-  db.collection('programs')
-    .orderBy('order', 'asc')
-    .get()
-    .then(docs => {
-      const programArray = []
+  const request = {
+    // It would be an array of programIds
+    programs: req.body.programs
+  }
 
-      docs.forEach(doc => {
-        programArray.push(doc.data())
+  const programs = request.programs
+
+  const programPromises = programs.map(program => {
+    return db
+      .collection('programs')
+      .doc(program)
+      .get()
+  })
+
+  Promise.all(programPromises)
+    .then(docSnapshotArray => {
+      let activeProgramArray = []
+
+      docSnapshotArray.forEach(doc => {
+        const data = doc.data()
+        activeProgramArray.push(data)
       })
 
       return res.status(200).json({
         message: 'Success',
-        programs: programArray
+        programs: activeProgramArray
       })
     })
     .catch(error => {
       return res.status(500).json({
-        message:
-          "Could't load the programs. Click refresh button to try again.",
+        message: 'Server error. Try again!',
         error: error
       })
     })

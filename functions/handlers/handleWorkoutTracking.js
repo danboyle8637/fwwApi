@@ -1,11 +1,10 @@
 // When the user hits the Program Dashbaoard... launch this function.
 // It will setup Workout Tracking in the database for all of the workouts.
 // But it will do this async... no update to state or anything.
-// This can be a background function
 
 const db = require('../utils/admin').db
 
-exports.setupWorkoutTracking = (req, res) => {
+exports.handleWorkoutTracking = (req, res) => {
   //const data = JSON.parse(req.body)
 
   const request = {
@@ -23,15 +22,24 @@ exports.setupWorkoutTracking = (req, res) => {
     .doc(username)
     .collection('Programs')
     .doc(programId)
-    .listCollections()
-    .then(collections => {
-      if (collections.length > 0) {
-        console.log('Workouts collection exists')
+    .collection('Workouts')
+    .get()
+    .then(docsSnapshot => {
+      let docsArray = []
+      docsSnapshot.forEach(doc => {
+        docsArray.push(doc.data())
+      })
+      if (docsArray.length > 1) {
         sendBackWorkoutTracking()
       } else {
-        console.log('Workouts collection does not exist')
         createWorkoutTracking()
       }
+    })
+    .catch(error => {
+      return res.status(400).json({
+        message: `Error getting docs in collection ${programId}`,
+        error: error
+      })
     })
 
   const createWorkoutTracking = () => {
@@ -60,7 +68,20 @@ exports.setupWorkoutTracking = (req, res) => {
             isComplete: false
           }
         },
-        trackingStats: {},
+        trackingStats: {
+          first: {
+            number: null,
+            timestamp: null
+          },
+          second: {
+            number: null,
+            timestamp: null
+          },
+          third: {
+            number: null,
+            timestamp: null
+          }
+        },
         isFavorite: false
       }
 
@@ -76,7 +97,10 @@ exports.setupWorkoutTracking = (req, res) => {
 
     Promise.all(workoutDocPromises)
       .then(() => {
-        sendBackWorkoutTracking()
+        res.json({
+          message: 'Workout tracking successfully setup'
+        })
+        //sendBackWorkoutTracking()
       })
       .catch(error => {
         return res.status(404).json({
@@ -90,27 +114,28 @@ exports.setupWorkoutTracking = (req, res) => {
     db.collection('users')
       .doc(username)
       .collection('Programs')
-      .doc(programId)
-      .collection('Workouts')
       .get()
-      .then(collectionSnapshot => {
+      .then(docsSnapshot => {
         let docsArray = []
-        collectionSnapshot.forEach(doc => {
+        docsSnapshot.forEach(doc => {
           docsArray.push(doc.data())
         })
-        // const percentComplete = docsArray.filter(element => {
-        //   return element.title === 'PercentComplete'
-        // })
+        const percentComplete = docsArray.filter(element => {
+          return element.title === 'PercentComplete'
+        })
         // How we get rid of the percentComplete document
-        // const statsWorkoutArray = docsArray.filter(element => {
-        //   return element.totalWorkouts !== 5
-        // })
+        const statsWorkoutArray = docsArray.filter(element => {
+          return element.totalWorkouts !== 5
+        })
         // TODO You need to decide how you want the dats in client state to be
         // That is what you will construct here and send back
-        const stats = docsArray.reduce((accumulator, currentValue) => {
+        const stats = statsWorkoutArray.reduce((accumulator, currentValue) => {
           const complete1 = currentValue.completed.complete1
           const complete2 = currentValue.completed.complete2
           const complete3 = currentValue.completed.complete3
+          const first = currentValue.trackingStats.first
+          const second = currentValue.trackingStats.second
+          const third = currentValue.trackingStats.third
           const workoutId = currentValue.workoutId
           accumulator[workoutId] = {
             completed: {
@@ -118,7 +143,11 @@ exports.setupWorkoutTracking = (req, res) => {
               complete2,
               complete3
             },
-            trackingStats: {},
+            trackingStats: {
+              first,
+              second,
+              third
+            },
             isFavorite: currentValue.isFavorite,
             name: currentValue.name,
             programId: currentValue.programId,
@@ -126,15 +155,15 @@ exports.setupWorkoutTracking = (req, res) => {
           }
           return accumulator
         }, {})
-
         res.status(200).json({
-          message: 'Stats retrieved',
+          message: 'Stats successfully retrieved',
+          percentComplete: percentComplete,
           stats: stats
         })
       })
       .catch(error => {
         res.status(404).json({
-          message: 'Could not get stats. Please try again.',
+          message: 'Could not get workouts stats. Please try again.',
           error: error
         })
       })
