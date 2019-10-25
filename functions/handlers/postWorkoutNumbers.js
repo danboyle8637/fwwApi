@@ -1,17 +1,17 @@
 const db = require('../utils/admin').db
 
 exports.postWorkoutNumbers = (req, res) => {
-  //const data = JSON.parse(req.body)
+  const data = JSON.parse(req.body)
 
   const request = {
-    username: req.body.username,
-    programId: req.body.programId,
-    workoutId: req.body.workoutId,
-    number: req.body.number,
-    date: req.body.date
+    userId: data.userId,
+    programId: data.programId,
+    workoutId: data.workoutId,
+    number: data.number,
+    date: data.date
   }
 
-  const username = request.username
+  const userId = request.userId
   const programId = request.programId
   const workoutId = request.workoutId
   const number = Number(request.number)
@@ -20,7 +20,7 @@ exports.postWorkoutNumbers = (req, res) => {
 
   const stats = db
     .collection('users')
-    .doc(username)
+    .doc(userId)
     .collection('Programs')
     .doc(programId)
     .collection('Workouts')

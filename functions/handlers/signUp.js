@@ -11,19 +11,18 @@ const {
 } = require('../utils/formatValidate')
 
 exports.signUp = (req, res) => {
-  //   const data = JSON.parse(req.body)
+  const data = JSON.parse(req.body)
 
   // The req object body with user info.
   const userInfo = {
-    userId: req.body.userId,
-    programId: req.body.programId,
-    totalWorkouts: req.body.totalWorkouts,
-    firstName: req.body.firstName,
-    username: req.body.username,
-    password: req.body.password,
-    confirmPassword: req.body.confirmPassword,
-    email: req.body.email,
-    biggestObstacle: req.body.biggestObstacle
+    userId: data.userId,
+    programId: data.programId,
+    totalWorkouts: data.totalWorkouts,
+    firstName: data.firstName,
+    password: data.password,
+    confirmPassword: data.confirmPassword,
+    email: data.email,
+    biggestObstacle: data.biggestObstacle
   }
 
   // Format and validate userInfo
@@ -76,7 +75,6 @@ exports.signUp = (req, res) => {
     programId: userInfo.programId,
     totalWorkouts: userInfo.totalWorkouts,
     firstName: formattedFirstName,
-    username: formattedUsername,
     password: userInfo.password,
     email: userInfo.email.toLowerCase(),
     biggestObstacle: userInfo.biggestObstacle
@@ -89,13 +87,13 @@ exports.signUp = (req, res) => {
     const baseAvatarImage = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media`
 
     db.collection('users')
-      .doc(cleanUserInfo.username)
+      .doc(cleanUserInfo.userId)
       .get()
       .then(userDoc => {
         if (userDoc.exists) {
           // the username already exists. Return error.
           return res.status(400).json({
-            error: `Username, ${cleanUserInfo.username}, already exists. Try a different one or create a new one.`
+            error: `Account, already exists. Try again.`
           })
         } else {
           // Step 3: Updating user with cleaned and formatted data.
@@ -136,7 +134,6 @@ exports.signUp = (req, res) => {
         const userDoc = {
           userId: userId,
           firstName: cleanUserInfo.firstName,
-          username: cleanUserInfo.username,
           programs: [cleanUserInfo.programId],
           biggestObstacle: cleanUserInfo.biggestObstacle,
           createdAt: new Date().toLocaleDateString()
@@ -144,7 +141,7 @@ exports.signUp = (req, res) => {
 
         return db
           .collection('users')
-          .doc(userDoc.username)
+          .doc(userDoc.userId)
           .set(userDoc)
       })
       .then(() => {
@@ -156,7 +153,7 @@ exports.signUp = (req, res) => {
 
         return db
           .collection('accounts')
-          .doc(cleanUserInfo.username)
+          .doc(cleanUserInfo.userId)
           .set(accountsDoc)
       })
       .then(() => {
@@ -170,7 +167,7 @@ exports.signUp = (req, res) => {
 
         return db
           .collection('users')
-          .doc(cleanUserInfo.username)
+          .doc(cleanUserInfo.userId)
           .collection('Programs')
           .doc(cleanUserInfo.programId)
           .set(percentComplete)
@@ -183,7 +180,6 @@ exports.signUp = (req, res) => {
         return res.status(201).json({
           success: `💪 Account created. Congrats!`,
           firstName: cleanUserInfo.firstName,
-          username: cleanUserInfo.username,
           photoUrl: baseAvatarImage,
           programs: programArray
         })

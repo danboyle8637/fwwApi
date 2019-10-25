@@ -4,9 +4,11 @@ const db = require('../utils/admin').db
 // It also lets me put them in the right order
 
 exports.getPrograms = (req, res) => {
+  const data = JSON.parse(req.body)
+
   const request = {
     // It would be an array of programIds
-    programs: req.body.programs
+    programs: data.programs
   }
 
   const programs = request.programs

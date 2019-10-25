@@ -1,23 +1,23 @@
 const db = require('../utils/admin').db
 
 exports.postComplete = (req, res) => {
-  //const data = JSON.parse(req.body)
+  const data = JSON.parse(req.body)
 
   const request = {
-    username: req.body.username,
-    programId: req.body.programId,
-    workoutId: req.body.workoutId,
-    completeId: req.body.completeId
+    userId: data.userId,
+    programId: data.programId,
+    workoutId: data.workoutId,
+    completeId: data.completeId
   }
 
-  const username = request.username
+  const userId = request.userId
   const programId = request.programId
   const workoutId = request.workoutId
   const completeId = request.completeId
 
   const workoutStats = db
     .collection('users')
-    .doc(username)
+    .doc(userId)
     .collection('Programs')
     .doc(programId)
     .collection('Workouts')

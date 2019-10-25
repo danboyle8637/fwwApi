@@ -4,13 +4,13 @@ exports.getUser = (req, res) => {
   const data = JSON.parse(req.body)
 
   const userData = {
-    username: data.username
+    userId: data.userId
   }
 
-  const username = userData.username
+  const userId = userData.userId
 
   db.collection('users')
-    .doc(username)
+    .doc(userId)
     .get()
     .then(userDoc => {
       const userData = userDoc.data()
@@ -18,7 +18,6 @@ exports.getUser = (req, res) => {
       return res.status(200).json({
         message: 'Successfully got user',
         firstName: userData.firstName,
-        username: userData.username,
         programs: userData.programs,
         photoUrl: userData.photoUrl
       })

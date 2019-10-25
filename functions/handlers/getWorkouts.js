@@ -1,10 +1,10 @@
 const db = require('../utils/admin').db
 
 exports.getWorkouts = (req, res) => {
-  //const data = JSON.parse(req.body)
+  const data = JSON.parse(req.body)
 
   const request = {
-    programId: req.body.programId
+    programId: data.programId
   }
 
   const programId = request.programId

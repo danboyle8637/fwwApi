@@ -6,21 +6,21 @@
 const db = require('../utils/admin').db
 
 exports.setupWorkoutTracking = (req, res) => {
-  //const data = JSON.parse(req.body)
+  const data = JSON.parse(req.body)
 
   const request = {
-    programId: req.body.programId,
-    username: req.body.username,
-    workoutsArray: req.body.workoutsArray
+    programId: data.programId,
+    userId: data.userId,
+    workoutsArray: data.workoutsArray
   }
 
   const programId = request.programId
-  const username = request.username
+  const userId = request.userId
   const workoutsArray = request.workoutsArray
 
   // Check, does workout tracking already exist?
   db.collection('users')
-    .doc(username)
+    .doc(userId)
     .collection('Programs')
     .doc(programId)
     .listCollections()
@@ -66,7 +66,7 @@ exports.setupWorkoutTracking = (req, res) => {
 
       return db
         .collection('users')
-        .doc(username)
+        .doc(userId)
         .collection('Programs')
         .doc(programId)
         .collection('Workouts')
@@ -88,7 +88,7 @@ exports.setupWorkoutTracking = (req, res) => {
 
   const sendBackWorkoutTracking = () => {
     db.collection('users')
-      .doc(username)
+      .doc(userId)
       .collection('Programs')
       .doc(programId)
       .collection('Workouts')

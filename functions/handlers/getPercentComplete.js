@@ -8,11 +8,11 @@ exports.getPercentComplete = (req, res) => {
   // const data = JSON.parse(req.body)
 
   const request = {
-    username: req.body.username,
+    userId: req.body.userId,
     programs: req.body.programs
   }
 
-  const username = request.username
+  const userId = request.userId
   const programs = request.programs
 
   const percentCompletePromises = programs.map(program => {
@@ -20,17 +20,10 @@ exports.getPercentComplete = (req, res) => {
     // ... where the programs are setup for the user.
     return db
       .collection('users')
-      .doc(username)
+      .doc(userId)
       .collection('Programs')
       .doc(program)
       .get()
-
-    // return db
-    //   .collection('users')
-    //   .doc(username)
-    //   .collection('Programs')
-    //   .doc(program)
-    //   .get()
   })
 
   Promise.all(percentCompletePromises)
