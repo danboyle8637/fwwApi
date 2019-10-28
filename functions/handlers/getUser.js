@@ -17,6 +17,7 @@ exports.getUser = (req, res) => {
 
       return res.status(200).json({
         message: 'Successfully got user',
+        userId: userData.userId,
         firstName: userData.firstName,
         programs: userData.programs,
         photoUrl: userData.photoUrl

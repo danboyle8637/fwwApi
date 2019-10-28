@@ -5,15 +5,17 @@ exports.getPercentComplete = (req, res) => {
   // You need to get the progress for each program in the array
   // Even if it's only one program in the array
 
-  // const data = JSON.parse(req.body)
+  const data = JSON.parse(req.body)
 
   const request = {
-    userId: req.body.userId,
-    programs: req.body.programs
+    userId: data.userId,
+    programs: data.programs
   }
 
   const userId = request.userId
   const programs = request.programs
+
+  console.log(programs)
 
   const percentCompletePromises = programs.map(program => {
     // TODO use the return statement below. This todo refers to the signup endpoint

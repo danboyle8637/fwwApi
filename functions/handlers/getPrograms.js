@@ -7,37 +7,49 @@ exports.getPrograms = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
-    // It would be an array of programIds
-    programs: data.programs
+    programIdArray: data.programIdArray
   }
 
-  const programs = request.programs
+  const activeProgramArray = request.programIdArray
 
-  const programPromises = programs.map(program => {
-    return db
-      .collection('programs')
-      .doc(program)
-      .get()
-  })
+  db.collection('programs')
+    .get()
+    .then(docsArray => {
+      let programArray = []
 
-  Promise.all(programPromises)
-    .then(docSnapshotArray => {
-      let activeProgramArray = []
-
-      docSnapshotArray.forEach(doc => {
+      docsArray.forEach(doc => {
         const data = doc.data()
-        activeProgramArray.push(data)
+        programArray.push(data)
       })
 
+      const sortedPrograms = activeProgramArray.reduce(
+        (accumulator, currentValue) => {
+          programArray.forEach(program => {
+            if (program.programId === currentValue) {
+              accumulator.push(program)
+            }
+          })
+
+          programArray = programArray.filter(
+            program => program.programId !== currentValue
+          )
+
+          return accumulator
+        },
+        []
+      )
+
+      const sortedProgramsArray = [...sortedPrograms, ...programArray]
+
       return res.status(200).json({
-        message: 'Success',
-        programs: activeProgramArray
+        message: 'Here are your programs',
+        programs: sortedProgramsArray
       })
     })
     .catch(error => {
       return res.status(500).json({
-        message: 'Server error. Try again!',
-        error: error
+        message: 'Couldnt get programs. Try again.',
+        error
       })
     })
 }

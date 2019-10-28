@@ -37,12 +37,12 @@ exports.setupWorkoutTracking = (req, res) => {
   const createWorkoutTracking = () => {
     const workoutDocPromises = workoutsArray.map(workout => {
       const workoutId = workout.workoutId
-      const workoutName = workout.name
+      const workoutTitle = workout.title
 
       const workoutDocData = {
         programId: programId,
         workoutId: workoutId,
-        name: workoutName,
+        title: workoutTitle,
         completed: {
           complete1: {
             id: 1,
@@ -120,7 +120,7 @@ exports.setupWorkoutTracking = (req, res) => {
             },
             trackingStats: {},
             isFavorite: currentValue.isFavorite,
-            name: currentValue.name,
+            title: currentValue.title,
             programId: currentValue.programId,
             workoutId: currentValue.workoutId
           }

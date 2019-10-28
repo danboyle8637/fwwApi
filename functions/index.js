@@ -21,7 +21,7 @@ const app = express()
 
 app.use(cors({ origin: true }))
 
-app.get('/get-programs', getPrograms)
+app.post('/get-programs', getPrograms)
 app.post('/sign-up', signUp)
 app.post('/get-user', getUser)
 app.post('/get-percent-complete', getPercentComplete)

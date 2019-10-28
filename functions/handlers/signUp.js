@@ -179,6 +179,7 @@ exports.signUp = (req, res) => {
 
         return res.status(201).json({
           success: `💪 Account created. Congrats!`,
+          userId: cleanUserInfo.userId,
           firstName: cleanUserInfo.firstName,
           photoUrl: baseAvatarImage,
           programs: programArray
