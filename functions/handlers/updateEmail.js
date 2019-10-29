@@ -26,7 +26,7 @@ exports.updateEmail = (req, res) => {
     })
     .catch(error => {
       return res.status(500).json({
-        message: '😬 Oh no! Try that again.',
+        message: '😬 Oh no! Try again.',
         error
       })
     })
