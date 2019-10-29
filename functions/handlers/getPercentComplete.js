@@ -15,8 +15,6 @@ exports.getPercentComplete = (req, res) => {
   const userId = request.userId
   const programs = request.programs
 
-  console.log(programs)
-
   const percentCompletePromises = programs.map(program => {
     // TODO use the return statement below. This todo refers to the signup endpoint
     // ... where the programs are setup for the user.

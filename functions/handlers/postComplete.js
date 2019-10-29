@@ -1,4 +1,5 @@
 const db = require('../utils/admin').db
+const admin = require('../utils/admin').admin
 
 exports.postComplete = (req, res) => {
   const data = JSON.parse(req.body)
@@ -14,6 +15,14 @@ exports.postComplete = (req, res) => {
   const programId = request.programId
   const workoutId = request.workoutId
   const completeId = request.completeId
+  const timestamp = new Date().toLocaleDateString()
+  const increment = admin.firestore.FieldValue.increment(1)
+
+  const programState = db
+    .collection('users')
+    .doc(userId)
+    .collection('Programs')
+    .doc(programId)
 
   const workoutStats = db
     .collection('users')
@@ -22,6 +31,19 @@ exports.postComplete = (req, res) => {
     .doc(programId)
     .collection('Workouts')
     .doc(workoutId)
+
+  const handleIncrementWorkoutsCompleted = () => {
+    programState
+      .update({
+        workoutsCompleted: increment
+      })
+      .then(() => {
+        console.log('Increment successful!')
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
 
   workoutStats
     .get()
@@ -37,9 +59,13 @@ exports.postComplete = (req, res) => {
         workoutStats
           .update({
             'completed.complete1.isComplete': true,
-            'completed.complete1.timestamp': new Date().toLocaleDateString()
+            'completed.complete1.timestamp': timestamp,
+            'trackingStats.first.number': '--',
+            'trackingStats.first.date': '--',
+            'trackingStats.first.timestamp': timestamp
           })
           .then(() => {
+            handleIncrementWorkoutsCompleted()
             res.status(200).json({
               message: `Success 💪`
             })
@@ -56,7 +82,10 @@ exports.postComplete = (req, res) => {
         workoutStats
           .update({
             'completed.complete2.isComplete': true,
-            'completed.complete2.timestamp': new Date().toLocaleDateString()
+            'completed.complete2.timestamp': timestamp,
+            'trackingStats.second.number': '--',
+            'trackingStats.second.date': '--',
+            'trackingStats.second.timestamp': timestamp
           })
           .then(() => {
             res.status(200).json({
@@ -79,7 +108,10 @@ exports.postComplete = (req, res) => {
         workoutStats
           .update({
             'completed.complete3.isComplete': true,
-            'completed.complete3.timestamp': new Date().toLocaleDateString()
+            'completed.complete3.timestamp': timestamp,
+            'trackingStats.second.number': '--',
+            'trackingStats.second.date': '--',
+            'trackingStats.second.timestamp': timestamp
           })
           .then(() => {
             res.status(200).json({

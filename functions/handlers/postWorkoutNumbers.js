@@ -1,4 +1,5 @@
 const db = require('../utils/admin').db
+const admin = require('../utils/admin').admin
 
 exports.postWorkoutNumbers = (req, res) => {
   const data = JSON.parse(req.body)
@@ -17,6 +18,13 @@ exports.postWorkoutNumbers = (req, res) => {
   const number = Number(request.number)
   const date = request.date
   const timestamp = new Date()
+  const increment = admin.firestore.FieldValue.increment(1)
+
+  const programState = db
+    .collection('users')
+    .doc(userId)
+    .collection('Programs')
+    .doc(programId)
 
   const stats = db
     .collection('users')
@@ -26,24 +34,28 @@ exports.postWorkoutNumbers = (req, res) => {
     .collection('Workouts')
     .doc(workoutId)
 
+  const handleIncrementWorkoutsCompleted = () => {
+    programState
+      .update({
+        workoutsCompleted: increment
+      })
+      .then(() => {
+        console.log('Increment successful!')
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
   stats
     .get()
     .then(docSnapshot => {
       const data = docSnapshot.data()
-      if (
-        Object.keys(data.trackingStats).length === 0 ||
-        data.trackingStats.first.number === null
-      ) {
+      if (!Object.keys(data.trackingStats).includes('first')) {
         saveFirstNumber()
-      } else if (
-        !Object.keys(data.trackingStats).includes('second') ||
-        data.trackingStats.second.number === null
-      ) {
+      } else if (!Object.keys(data.trackingStats).includes('second')) {
         saveSecondNumber()
-      } else if (
-        !Object.keys(data.trackingStats).includes('third') ||
-        data.trackingStats.third.number === null
-      ) {
+      } else if (!Object.keys(data.trackingStats).includes('third')) {
         saveThirdNumber()
       } else {
         res.status(200).json({
@@ -68,6 +80,7 @@ exports.postWorkoutNumbers = (req, res) => {
         'completed.complete1.timestamp': timestamp
       })
       .then(() => {
+        handleIncrementWorkoutsCompleted()
         res.status(200).json({
           message: `Success 💪`
         })
@@ -122,3 +135,4 @@ exports.postWorkoutNumbers = (req, res) => {
       })
   }
 }
+// if ( //   !Object.keys(data.trackingStats).includes('first') || //   data.trackingStats.first.number === null // ) { //   saveFirstNumber() // } else if ( //   !Object.keys(data.trackingStats).includes('second') || //   data.trackingStats.second.number === null // ) { //   saveSecondNumber() // } else if ( //   !Object.keys(data.trackingStats).includes('third') || //   data.trackingStats.third.number === null // ) { //   saveThirdNumber() // } else { //   res.status(200).json({ //     message: `Sorry we currently don't support more than three data points. Would you want more?` //   }) // }
