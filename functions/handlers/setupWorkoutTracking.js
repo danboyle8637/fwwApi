@@ -111,6 +111,7 @@ exports.setupWorkoutTracking = (req, res) => {
           const complete1 = currentValue.completed.complete1
           const complete2 = currentValue.completed.complete2
           const complete3 = currentValue.completed.complete3
+          const trackingStats = currentValue.trackingStats
           const workoutId = currentValue.workoutId
           accumulator[workoutId] = {
             completed: {
@@ -118,7 +119,7 @@ exports.setupWorkoutTracking = (req, res) => {
               complete2,
               complete3
             },
-            trackingStats: {},
+            trackingStats: trackingStats,
             isFavorite: currentValue.isFavorite,
             title: currentValue.title,
             programId: currentValue.programId,

@@ -38,7 +38,12 @@ exports.getPercentComplete = (req, res) => {
         const workoutsCompleted = docData.workoutsCompleted
         const programId = docData.programId
         const percent = Math.round((workoutsCompleted / totalWorkouts) * 100)
-        const percentData = { programId: programId, percentage: percent }
+        const percentData = {
+          programId: programId,
+          totalWorkouts: totalWorkouts,
+          workoutsCompleted: workoutsCompleted,
+          percentage: percent
+        }
 
         percentCompleteArray.push(percentData)
       })
