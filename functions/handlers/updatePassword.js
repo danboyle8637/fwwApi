@@ -5,12 +5,11 @@ exports.updatePassword = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
-    userId: data.userId,
     newPassword: data.newPassword,
     confirmPassword: data.confirmPassword
   }
 
-  const userId = request.userId
+  const userId = req.userId
   const newPassword = request.newPassword
   const confirmPassword = request.confirmPassword
 

@@ -5,14 +5,13 @@ exports.postWorkoutNumbers = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
-    userId: data.userId,
     programId: data.programId,
     workoutId: data.workoutId,
     number: data.number,
     date: data.date
   }
 
-  const userId = request.userId
+  const userId = req.userId
   const programId = request.programId
   const workoutId = request.workoutId
   const number = Number(request.number)
@@ -135,4 +134,3 @@ exports.postWorkoutNumbers = (req, res) => {
       })
   }
 }
-// if ( //   !Object.keys(data.trackingStats).includes('first') || //   data.trackingStats.first.number === null // ) { //   saveFirstNumber() // } else if ( //   !Object.keys(data.trackingStats).includes('second') || //   data.trackingStats.second.number === null // ) { //   saveSecondNumber() // } else if ( //   !Object.keys(data.trackingStats).includes('third') || //   data.trackingStats.third.number === null // ) { //   saveThirdNumber() // } else { //   res.status(200).json({ //     message: `Sorry we currently don't support more than three data points. Would you want more?` //   }) // }

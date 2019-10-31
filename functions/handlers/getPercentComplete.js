@@ -12,7 +12,7 @@ exports.getPercentComplete = (req, res) => {
     programs: data.programs
   }
 
-  const userId = request.userId
+  const userId = req.userId
   const programs = request.programs
 
   const percentCompletePromises = programs.map(program => {

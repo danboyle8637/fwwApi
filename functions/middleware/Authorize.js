@@ -12,7 +12,7 @@ exports.Authorize = (req, res, next) => {
     auth
       .verifyIdToken(tokenId)
       .then(decodedToken => {
-        req.user = decodedToken
+        req.userId = decodedToken.uid
         return next()
       })
       .catch(error => {

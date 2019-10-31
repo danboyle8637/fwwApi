@@ -4,11 +4,10 @@ exports.updateEmail = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
-    userId: data.userId,
     newEmail: data.newEmail
   }
 
-  const userId = request.userId
+  const userId = req.userId
   const newEmail = request.newEmail
 
   db.collection('accounts')

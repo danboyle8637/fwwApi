@@ -5,13 +5,12 @@ exports.postComplete = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
-    userId: data.userId,
     programId: data.programId,
     workoutId: data.workoutId,
     completeId: data.completeId
   }
 
-  const userId = request.userId
+  const userId = req.userId
   const programId = request.programId
   const workoutId = request.workoutId
   const completeId = request.completeId

@@ -5,13 +5,12 @@ exports.postFavorite = (req, res) => {
 
   const request = {
     programId: data.programId,
-    workoutId: data.workoutId,
-    userId: data.userId
+    workoutId: data.workoutId
   }
 
   const programId = request.programId
   const workoutId = request.workoutId
-  const userId = request.userId
+  const userId = req.userId
 
   const workout = db
     .collection('users')

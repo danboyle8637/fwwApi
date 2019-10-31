@@ -1,13 +1,7 @@
 const db = require('../utils/admin').db
 
 exports.getUser = (req, res) => {
-  const data = JSON.parse(req.body)
-
-  const userData = {
-    userId: data.userId
-  }
-
-  const userId = userData.userId
+  const userId = req.userId
 
   db.collection('users')
     .doc(userId)
@@ -17,7 +11,6 @@ exports.getUser = (req, res) => {
 
       return res.status(200).json({
         message: 'Successfully got user',
-        userId: userData.userId,
         firstName: userData.firstName,
         programs: userData.programs,
         photoUrl: userData.photoUrl

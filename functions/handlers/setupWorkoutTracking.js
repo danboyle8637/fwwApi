@@ -10,12 +10,11 @@ exports.setupWorkoutTracking = (req, res) => {
 
   const request = {
     programId: data.programId,
-    userId: data.userId,
     workoutsArray: data.workoutsArray
   }
 
   const programId = request.programId
-  const userId = request.userId
+  const userId = req.userId
   const workoutsArray = request.workoutsArray
 
   // Check, does workout tracking already exist?
@@ -98,15 +97,7 @@ exports.setupWorkoutTracking = (req, res) => {
         collectionSnapshot.forEach(doc => {
           docsArray.push(doc.data())
         })
-        // const percentComplete = docsArray.filter(element => {
-        //   return element.title === 'PercentComplete'
-        // })
-        // How we get rid of the percentComplete document
-        // const statsWorkoutArray = docsArray.filter(element => {
-        //   return element.totalWorkouts !== 5
-        // })
-        // TODO You need to decide how you want the dats in client state to be
-        // That is what you will construct here and send back
+
         const stats = docsArray.reduce((accumulator, currentValue) => {
           const complete1 = currentValue.completed.complete1
           const complete2 = currentValue.completed.complete2
