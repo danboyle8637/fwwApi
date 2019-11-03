@@ -1,89 +1,76 @@
 const storage = require('../utils/admin').storage
 const auth = require('../utils/admin').auth
+const path = require('path')
+const os = require('os')
+const fs = require('fs')
+const sharp = require('sharp')
+const Busboy = require('busboy')
 
 const config = require('../fbconfig')
 
 exports.uploadProfileImage = (req, res) => {
-  const BusBoy = require('busboy')
-  const os = require('os')
-  const path = require('path')
-  const fs = require('fs')
+  const { dirname, join } = path
+  const { tmpdir } = os
+  const userId = req.userId
 
-  const busboy = new BusBoy({
-    headers: req.headers
-  })
-  const tempdir = os.tmpdir()
-  const userDisplayName = req.user.displayName
+  const busyboy = new Busboy({ headers: req.headers })
+  const bucket = storage.bucket(config.storageBucket)
 
-  let imageFileName
-  let imageToUpload
+  let imageUpload
+  const fileWrites = []
+  let userEmailHandle
+  let newAvatarName
 
-  busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-    const imageExtension = filename.split('.').pop()
+  auth
+    .getUser(userId)
+    .then(user => {
+      userEmailHandle = user.email.split('@')[0]
+      newAvatarName = `new-avatar-${userEmailHandle}-300x300`
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Could not get user'
+      })
+    })
 
-    if (mimetype !== 'image/png' || mimetype !== 'image/jpeg') {
-      return res.status(400).json({ error: 'Image must be a jpg or png file' })
-    }
-
-    imageFileName = `avatar_${userDisplayName}.${imageExtension}`
-
-    // imageFileName = `${Math.round(
-    //   Math.random() * 1000000000
-    // )}.${imageExtension}`
-
-    // Temporarty holding location(path) for our image file
-    const filePath = path.join(tempdir, imageFileName)
-
-    // Create the image to upload
-    imageToUpload = { filePath: filePath, mimetype: mimetype }
+  busyboy.on('file', (fieldname, file, filename, mimetype) => {
+    const filePath = join(tmpdir, filename)
+    imageUpload = filePath
 
     const writeStream = fs.createWriteStream(filePath)
     file.pipe(writeStream)
+
+    const promise = new Promise((resolve, reject) => {
+      file.on('end', () => {
+        writeStream.end()
+      })
+      writeStream.on('finish', resolve)
+      writeStream.on('error', reject)
+    })
+    fileWrites.push(promise)
   })
 
-  busboy.on('finish', () => {
-    storage
-      .bucket()
-      .upload(imageToUpload.filePath, {
-        destination: `users/${imageFileName}`,
-        resumable: false,
-        metadata: {
-          metadata: {
-            contentType: imageToUpload.mimetype
-          }
-        }
-      })
-      .then(() => {
-        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users%2F${imageFileName}?alt=media`
+  busyboy.on('finish', () => {
+    Promise.all(fileWrites).then(() => {
+      const resizedImage = sharp(file).resize(300, 300)
 
-        // Protected route so it will have the user when it's called.
-        // This will give you the uid to update the user.
-        const uid = req.user.uid
-        return auth
-          .updateUser(uid, {
-            photoURL: imageUrl
-          })
-          .then(userRecord => {
-            const profileUrl = userRecord.photoURL
-            res.status(201).json({
-              success: 'User profile successfully updated with new photoUrl.',
-              url: profileUrl
-            })
-          })
-          .catch(error => {
-            res.status(500).json({
-              error: 'User profile was not updated with new photoUrl',
-              error: error
-            })
-          })
-      })
-      .catch(error => {
-        res.status(500).json({
-          errorMessage: 'File not uploaded to cloud storage.',
-          error: error
-        })
-      })
+      // https://sharp.pixelplumbing.com/en/stable/api-constructor/
+      // https://www.youtube.com/watch?v=OKW8x8-qYs0
+      // https://firebase.google.com/docs/auth/admin/manage-users
+
+      fs.unlinkSync(imageUpload)
+    })
   })
 
-  busboy.end(req.rawBody)
+  busyboy.end(req.rawBody)
+
+  // // Create temporary working directory
+  // const workingDirectory = join(tmpdir(), 'thumbnail')
+  // // Create temporary file path
+  // const tempFilePath = join(workingDirectory, 'source.jpg')
+  // const newAvatarName = ``
+
+  // const bucket = storage.bucket(config.storageBucket)
+
+  // const resizedImage = sharp(newImage).resize(300, 300).toF
 }
