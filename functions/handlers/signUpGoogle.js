@@ -1,43 +1,33 @@
 const db = require('../utils/admin').db
 const auth = require('../utils/admin').auth
 
-const config = require('../fbconfig')
 const {
   checkIsEmail,
   checkIsEmpty,
   cleanAndCheckUsername,
-  confirmPasswordsEqual,
   formatNames
 } = require('../utils/formatValidate')
 
-exports.signUp = (req, res) => {
+exports.signUpGoogle = (req, res) => {
   const data = JSON.parse(req.body)
 
-  // The req object body with user info.
-  const userInfo = {
+  const request = {
     userId: data.userId,
     programId: data.programId,
     totalWorkouts: data.totalWorkouts,
     firstName: data.firstName,
-    password: data.password,
-    confirmPassword: data.confirmPassword,
     email: data.email,
-    biggestObstacle: data.biggestObstacle
+    biggestObstacle: data.biggestObstacle,
+    photoUrl: data.photoUrl
   }
 
-  // Format and validate userInfo
   let errors = {}
 
-  const isFirstNameEmpty = checkIsEmpty(userInfo.firstName)
-  const isPasswordEmpty = checkIsEmpty(userInfo.password)
-  const isBiggestObstacleEmpty = checkIsEmpty(userInfo.biggestObstacle)
-  const isEmailValid = checkIsEmail(userInfo.email)
-  const passwordsEqual = confirmPasswordsEqual(
-    userInfo.password,
-    userInfo.confirmPassword
-  )
-  const formattedFirstName = formatNames(userInfo.firstName)
-  const formattedUsername = cleanAndCheckUsername(userInfo.username)
+  const isFirstNameEmpty = checkIsEmpty(request.firstName)
+  const isBiggestObstacleEmpty = checkIsEmpty(request.biggestObstacle)
+  const isEmailValid = checkIsEmail(request.email)
+  const formattedFirstName = formatNames(request.firstName)
+  const formattedUsername = cleanAndCheckUsername(request.username)
 
   if (isFirstNameEmpty) {
     errors.firstName = 'Enter your first name.'
@@ -47,16 +37,8 @@ exports.signUp = (req, res) => {
     errors.username = 'Check your username.'
   }
 
-  if (isPasswordEmpty) {
-    errors.password = 'Create a password.'
-  }
-
   if (!isEmailValid) {
     errors.email = 'Enter valid email address.'
-  }
-
-  if (!passwordsEqual) {
-    errors.passwordsEqual = "Passwords don't match. Try again."
   }
 
   if (isBiggestObstacleEmpty) {
@@ -71,44 +53,35 @@ exports.signUp = (req, res) => {
   }
 
   const cleanUserInfo = {
-    userId: userInfo.userId,
-    programId: userInfo.programId,
-    totalWorkouts: userInfo.totalWorkouts,
+    userId: request.userId,
+    programId: request.programId,
+    totalWorkouts: request.totalWorkouts,
     firstName: formattedFirstName,
-    password: userInfo.password,
-    email: userInfo.email.toLowerCase(),
-    biggestObstacle: userInfo.biggestObstacle
+    email: request.email.toLowerCase(),
+    biggestObstacle: request.biggestObstacle,
+    photoUrl: request.photoUrl
   }
 
-  // Step 1: Get newly created user
   auth.getUser(cleanUserInfo.userId).then(userCredential => {
-    // Step 2: Does username already exist?
     const userId = userCredential.uid
-    const baseAvatarImage = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media`
-    const baseAvatarImageTiny = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar-tiny.jpg?alt=media`
 
     db.collection('users')
-      .doc(cleanUserInfo.userId)
+      .doc(userId)
       .get()
-      .then(userDoc => {
-        if (userDoc.exists) {
-          // the username already exists. Return error.
+      .then(docSnapshot => {
+        if (docSnapshot.exists) {
           return res.status(400).json({
-            error: `Account, already exists. Try again.`
+            message: 'Account exists. Try again.'
           })
         } else {
-          // Step 3: Updating user with cleaned and formatted data.
-          // This is going into the user in Authentication
           return auth.updateUser(userId, {
             email: cleanUserInfo.email,
-            password: cleanUserInfo.password,
             displayName: cleanUserInfo.firstName,
-            photoURL: baseAvatarImage
+            photoURL: cleanUserInfo.photoUrl
           })
         }
       })
       .then(() => {
-        // Step 4: Set customClaims on user to use with site access.
         let isFree
 
         if (
@@ -127,18 +100,16 @@ exports.signUp = (req, res) => {
             free: isFree
           })
           .then(() => {
-            console.log('Custom claim created.')
             return
           })
 
-        // Step 5: Create user document in database
         const userDoc = {
           userId: userId,
           firstName: cleanUserInfo.firstName,
           programs: [cleanUserInfo.programId],
           biggestObstacle: cleanUserInfo.biggestObstacle,
-          photoUrl: baseAvatarImage,
-          photoUrlTiny: baseAvatarImageTiny,
+          photoUrl: cleanUserInfo.photoUrl,
+          photoUrlTiny: '',
           createdAt: new Date().toLocaleDateString()
         }
 
@@ -148,8 +119,7 @@ exports.signUp = (req, res) => {
           .set(userDoc)
       })
       .then(() => {
-        // Step 6: Create user account document in database
-        const accountsDoc = {
+        const userAccountDoc = {
           firstName: cleanUserInfo.firstName,
           userId: userId,
           email: cleanUserInfo.email
@@ -157,11 +127,10 @@ exports.signUp = (req, res) => {
 
         return db
           .collection('accounts')
-          .doc(cleanUserInfo.userId)
-          .set(accountsDoc)
+          .doc(userId)
+          .set(userAccountDoc)
       })
       .then(() => {
-        // Step 7: Create the Percent Complete doc so it's ready to show
         const percentComplete = {
           workoutsCompleted: 0,
           totalWorkouts: cleanUserInfo.totalWorkouts,
@@ -170,26 +139,24 @@ exports.signUp = (req, res) => {
 
         return db
           .collection('users')
-          .doc(cleanUserInfo.userId)
+          .doc(userId)
           .collection('Programs')
           .doc(cleanUserInfo.programId)
           .set(percentComplete)
       })
       .then(() => {
-        // Step 7: Return the new user and get them to the dashboard.
-        const programArray = []
-        programArray.push(cleanUserInfo.programId)
+        const programsArray = []
+        programsArray.push(cleanUserInfo.programId)
 
         return res.status(201).json({
-          success: `💪 Account created. Congrats!`,
+          message: '💪 Account Created. Congrats!',
           firstName: cleanUserInfo.firstName,
-          photoUrl: baseAvatarImage,
-          photoUrlTiny: baseAvatarImageTiny,
-          programs: programArray
+          photoUrl: cleanUserInfo.photoUrl,
+          photoUrlTiny: '',
+          programs: programsArray
         })
       })
       .catch(error => {
-        console.log('Error signing up. Try again.')
         return res.status(500).json({
           message: 'Error signing up. Try again.',
           error: error

@@ -56,7 +56,7 @@ exports.uploadProfileImage = (req, res) => {
 
       // https://sharp.pixelplumbing.com/en/stable/api-constructor/
       // https://www.youtube.com/watch?v=OKW8x8-qYs0
-      // https://firebase.google.com/docs/auth/admin/manage-users
+      // https://cloud.google.com/functions/docs/writing/http
 
       fs.unlinkSync(imageUpload)
     })

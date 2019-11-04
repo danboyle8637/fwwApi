@@ -6,6 +6,7 @@
 const db = require('../utils/admin').db
 
 exports.setupWorkoutTracking = (req, res) => {
+  // TODO Something is not correct in this handler
   const data = JSON.parse(req.body)
 
   const request = {
