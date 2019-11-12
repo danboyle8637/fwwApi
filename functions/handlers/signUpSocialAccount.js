@@ -8,7 +8,7 @@ const {
   formatNames
 } = require('../utils/formatValidate')
 
-exports.signUpGoogle = (req, res) => {
+exports.signUpSocialAccount = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
