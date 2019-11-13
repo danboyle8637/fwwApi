@@ -1,6 +1,12 @@
 const auth = require('../utils/admin').auth
 
 exports.Authorize = (req, res, next) => {
+  if (!req.headers.authorization) {
+    return res.status(403).json({
+      error: 'Not a current user.'
+    })
+  }
+
   const authorization = req.headers.authorization
   const tokenPresent = req.headers.authorization.startsWith('Bearer ')
 
