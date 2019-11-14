@@ -86,7 +86,7 @@ exports.postWorkoutNumbers = (req, res) => {
       })
       .catch(error => {
         res.status(400).json({
-          message: 'Error 😭',
+          message: 'Error try again 😭',
           error: error
         })
       })
@@ -107,7 +107,7 @@ exports.postWorkoutNumbers = (req, res) => {
       })
       .catch(error => {
         res.status(400).json({
-          message: 'Error 😭',
+          message: 'Error try again 😭',
           error: error
         })
       })
@@ -128,7 +128,7 @@ exports.postWorkoutNumbers = (req, res) => {
       })
       .catch(error => {
         res.status(400).json({
-          message: 'Error 😭',
+          message: 'Error try again 😭',
           error: error
         })
       })

@@ -3,7 +3,7 @@ const auth = require('../utils/admin').auth
 exports.Authorize = (req, res, next) => {
   if (!req.headers.authorization) {
     return res.status(403).json({
-      error: 'Not a current user.'
+      message: `Not a current user. Go sign up first. It's free!`
     })
   }
 

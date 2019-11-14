@@ -22,7 +22,7 @@ exports.getUser = (req, res) => {
       } else {
         auth.deleteUser(userId).then(() => {
           return res.status(400).json({
-            message: 'Not a member yet. Sign Up!',
+            message: `Not a member yet. Sign up. It's free!`,
             error: 'not-member'
           })
         })
@@ -30,7 +30,7 @@ exports.getUser = (req, res) => {
     })
     .catch(error => {
       return res.status(500).json({
-        message: 'User not found.',
+        message: `User not found. Are you sure you're a member? If not go sign up. It's free!`,
         error: error
       })
     })

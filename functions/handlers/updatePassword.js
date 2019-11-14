@@ -29,5 +29,10 @@ exports.updatePassword = (req, res) => {
           message: '👍 Password updated!'
         })
       })
+      .catch(() => {
+        return res.status(500).json({
+          message: `😢 Couldn't update. Try again!`
+        })
+      })
   }
 }
