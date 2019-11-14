@@ -36,7 +36,7 @@ app.post('/toggle-favorite', Authorize, postFavorite)
 app.post('/update-email', Authorize, updateEmail)
 app.post('/update-password', Authorize, updatePassword)
 app.delete('/delete-account', Authorize, deleteAccount)
-app.post('/upload-profile-image', Authorize, uploadProfileImage)
+app.post('/upload-profile-image', uploadProfileImage)
 
 exports.api = functions.https.onRequest(app)
 

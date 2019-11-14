@@ -158,7 +158,7 @@ exports.signUpSocialAccount = (req, res) => {
       })
       .catch(error => {
         return res.status(500).json({
-          message: 'Error signing up. Try again.',
+          message: `😢 A network or server error prevented us from setting your account up. This is important. Logout of the app and log back in. If you can't see your programs... contact us immediately!`,
           error: error
         })
       })

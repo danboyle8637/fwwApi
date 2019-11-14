@@ -1,10 +1,6 @@
 const db = require('../utils/admin').db
 
 exports.getPercentComplete = (req, res) => {
-  // The program is going to be an array
-  // You need to get the progress for each program in the array
-  // Even if it's only one program in the array
-
   const data = JSON.parse(req.body)
 
   const request = {
@@ -53,7 +49,8 @@ exports.getPercentComplete = (req, res) => {
     })
     .catch(error => {
       return res.status(400).json({
-        message: 'Could not get the percent completed for each workout',
+        message:
+          '😢 Must be a network issue. We could not get your program stats. Try logging out and resigning in. If it keeps happening, contact us.',
         error: error
       })
     })

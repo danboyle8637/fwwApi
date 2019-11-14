@@ -25,10 +25,10 @@ exports.setupWorkoutTracking = (req, res) => {
     .listCollections()
     .then(collections => {
       if (collections.length > 0) {
-        console.log('Workouts collection exists')
+        // Workouts collection exists
         sendBackWorkoutTracking()
       } else {
-        console.log('Workouts collection does not exist')
+        // Workouts collection does not exist
         createWorkoutTracking()
       }
     })
@@ -79,7 +79,8 @@ exports.setupWorkoutTracking = (req, res) => {
       })
       .catch(error => {
         return res.status(404).json({
-          message: 'Workout documents not successfully created',
+          message:
+            '😬 Either a network or server error has stopped us from setting up your workout stats. Refresh to try again or contact us if this keeps happening.',
           error: error
         })
       })
@@ -126,7 +127,8 @@ exports.setupWorkoutTracking = (req, res) => {
       })
       .catch(error => {
         res.status(404).json({
-          message: 'Could not get stats. Please try again.',
+          message:
+            '😢 Either a server or network error has stopped us from getting your workout stats. Refresh to try again or let us know if this keeps happening.',
           error: error
         })
       })

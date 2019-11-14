@@ -1,0 +1,6 @@
+/*
+This endpoint will take a signed in user and if they had an error when they signed
+so that their account was created but none of their data was setup in the database...
+
+This endpoint will check if they have a doc... and if not it will set them up correctly.
+*/

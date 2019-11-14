@@ -48,7 +48,8 @@ exports.getPrograms = (req, res) => {
     })
     .catch(error => {
       return res.status(500).json({
-        message: 'Couldnt get programs. Try again.',
+        message:
+          '😢 Must be a network issue. We could not get your programs. Try logging out and resigning in. If it keeps happening, contact us.',
         error
       })
     })
