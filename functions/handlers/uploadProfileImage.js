@@ -5,12 +5,15 @@ const os = require('os')
 const fs = require('fs')
 const sharp = require('sharp')
 const Busboy = require('busboy')
+const uuid = require('uuid/v4')
 
 const config = require('../fbconfig')
 
 exports.uploadProfileImage = (req, res) => {
+  //const userId = req.userId
   const bucket = storage.bucket(config.storageBucket)
   const busboy = new Busboy({ headers: req.headers })
+  const token = uuid()
   const tmpdir = os.tmpdir()
 
   // This would be for fields that are submitted
@@ -44,12 +47,10 @@ exports.uploadProfileImage = (req, res) => {
       })
 
       busboy.on('finish', () => {
-        console.log(fileWrites)
         Promise.all(fileWrites)
           .then(files => {
             const image = files[0]
             const tmpFileName = `${userEmailHandle}-300x300-${fileNames[0]}`
-            console.log(tmpFileName)
             const tmpFilePath = path.join(tmpdir, tmpFileName)
 
             sharp(image)
@@ -59,16 +60,32 @@ exports.uploadProfileImage = (req, res) => {
               })
               .resize(300, 300)
               .toFile(tmpFilePath)
-              .then(data => {
-                console.log(data)
+              .then(() => {
                 bucket
                   .upload(tmpFilePath, {
-                    destination: `users/${tmpFileName}`
+                    destination: `users/${tmpFileName}`,
+                    resumable: false,
+                    uploadType: 'media',
+                    metadata: {
+                      contentType: 'image/png',
+                      metadata: {
+                        firebaseStorageDownloadTokens: token
+                      }
+                    }
                   })
                   .then(() => {
-                    return res.status(200).json({
-                      message: 'Image uploaded!'
-                    })
+                    auth
+                      .updateUser(user.uid, {
+                        photoURL: `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/users%2F${tmpFileName}.jpg?alt=media&token=${token}`
+                      })
+                      .then(() => {
+                        return res.status(200).json({
+                          message: 'Image uploaded!'
+                        })
+                      })
+                      .catch(() => {
+                        console.log('Could not update user')
+                      })
                   })
                   .catch(() => {
                     return res.status(500).json({
@@ -86,7 +103,6 @@ exports.uploadProfileImage = (req, res) => {
             console.log(error)
           })
       })
-
       busboy.end(req.rawBody)
     })
     .catch(() => {
