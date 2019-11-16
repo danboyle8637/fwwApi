@@ -17,7 +17,7 @@ let transporter = nodemailer.createTransport({
   }
 })
 
-module.exports = (req, res) => {
+exports = (req, res) => {
   return cors(req, res, () => {
     const subscriberInfo = {
       firstName: req.body.firstName,

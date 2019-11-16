@@ -2,73 +2,94 @@ const storage = require('../utils/admin').storage
 const auth = require('../utils/admin').auth
 const path = require('path')
 const os = require('os')
-const fs = require('fs-extra')
+const fs = require('fs')
 const sharp = require('sharp')
 const Busboy = require('busboy')
 
 const config = require('../fbconfig')
 
 exports.uploadProfileImage = (req, res) => {
-  const { dirname, join } = path
-  const { tmpdir } = os
-  const userId = req.body.userId
-
-  const busyboy = new Busboy({ headers: req.headers })
   const bucket = storage.bucket(config.storageBucket)
+  const busboy = new Busboy({ headers: req.headers })
+  const tmpdir = os.tmpdir()
 
-  let userEmailHandle
-  let newAvatarName
-  const functionWorkingDirectory = join(tmpdir(), 'avatar')
-  const uploadDir = 'users/'
-  let uploadData = {}
+  // This would be for fields that are submitted
+  const fields = {}
+  // This is for images
+  const fileNames = []
+  const fileWrites = []
 
   auth
     .getUser('BhWZiGKHPYeoVELdo8D24jFA3rQ2')
     .then(user => {
-      userEmailHandle = user.email.split('@')[0]
-      newAvatarName = `new-avatar-${userEmailHandle}-300x300`
-    })
-    .catch(() => {
-      res.status(500).json({
-        message: 'Could not get user'
+      const userEmailHandle = user.email.split('@')[0]
+      // const workingDirectory = path.join(tmpdir, 'image')
+
+      busboy.on('file', (fieldname, file, filename) => {
+        const filepath = path.join(tmpdir, filename)
+        fileNames.push(filename)
+
+        const writeStream = fs.createWriteStream(filepath)
+        file.pipe(writeStream)
+
+        const promise = new Promise((resolve, reject) => {
+          file.on('end', () => {
+            writeStream.end()
+          })
+          writeStream.on('finish', resolve(filepath))
+          writeStream.on('error', reject('Problem in writing the file'))
+        })
+
+        fileWrites.push(promise)
       })
-    })
 
-  busyboy.on('file', (fieldname, file, filename, mimetype) => {
-    fs.ensureDir(functionWorkingDirectory)
-      .then(() => {
-        // This is the file path to the uploaded file
-        const uploadedFilePath = join(functionWorkingDirectory, filename)
-        // This is my file path that will be overwritten with the cropped image
-        const tempRenamedFilePath = join(
-          functionWorkingDirectory,
-          newAvatarName
-        )
+      busboy.on('finish', () => {
+        console.log(fileWrites)
+        Promise.all(fileWrites)
+          .then(files => {
+            const image = files[0]
+            const tmpFileName = `${userEmailHandle}-300x300-${fileNames[0]}`
+            console.log(tmpFileName)
+            const tmpFilePath = path.join(tmpdir, tmpFileName)
 
-        sharp(uploadedFilePath)
-          .resize(300, 300)
-          .toFile(tempRenamedFilePath)
-          .then(() => {
-            uploadData = {
-              file: tempRenamedFilePath,
-              type: mimetype
-            }
-
-            file.pipe(fs.createWriteStream(tempRenamedFilePath))
+            sharp(image)
+              .jpeg({
+                quality: 60,
+                force: true
+              })
+              .resize(300, 300)
+              .toFile(tmpFilePath)
+              .then(data => {
+                console.log(data)
+                bucket
+                  .upload(tmpFilePath, {
+                    destination: `users/${tmpFileName}`
+                  })
+                  .then(() => {
+                    return res.status(200).json({
+                      message: 'Image uploaded!'
+                    })
+                  })
+                  .catch(() => {
+                    return res.status(500).json({
+                      message: 'Image not uploaded'
+                    })
+                  })
+              })
+              .catch(() => {
+                res.status(500).json({
+                  message: 'Image could not be resized.'
+                })
+              })
+          })
+          .catch(error => {
+            console.log(error)
           })
       })
-      .catch(() => {
-        console.log('Temporary working directory does not exist.')
-      })
-  })
 
-  busyboy.on('finish', () => {
-    bucket.upload(uploadData.file, {
-      destination: join(uploadDir, newAvatarName)
+      busboy.end(req.rawBody)
     })
-  })
-
-  busyboy.end(req.rawBody)
-
-  return fs.remove(functionWorkingDirectory)
+    .catch(() => {
+      return res.send('No user')
+    })
 }

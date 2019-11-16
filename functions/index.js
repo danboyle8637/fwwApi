@@ -18,6 +18,7 @@ const { updateEmail } = require('./handlers/updateEmail')
 const { updatePassword } = require('./handlers/updatePassword')
 const { deleteAccount } = require('./handlers/deleteAccount')
 const { uploadProfileImage } = require('./handlers/uploadProfileImage')
+const handleImageUpload = require('./functions/handleImageUpload')
 
 const app = express()
 
@@ -41,6 +42,7 @@ app.post('/upload-profile-image', uploadProfileImage)
 exports.api = functions.https.onRequest(app)
 
 exports.fwwContactPage = functions.https.onRequest(fwwContactPage)
+exports.imageUploadAndResize = functions.https.onRequest(handleImageUpload)
 
 // exports.updatePercentComplete = functions.firestore
 //   .document('/users/{username}/{programId}/{workoutId}')
