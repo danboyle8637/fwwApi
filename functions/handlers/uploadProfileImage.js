@@ -10,7 +10,7 @@ const uuid = require('uuid/v4')
 const config = require('../fbconfig')
 
 exports.uploadProfileImage = (req, res) => {
-  //const userId = req.userId
+  const userId = req.userId
   const bucket = storage.bucket(config.storageBucket)
   const busboy = new Busboy({ headers: req.headers })
   const token = uuid()
@@ -21,16 +21,18 @@ exports.uploadProfileImage = (req, res) => {
   // This is for images
   const fileNames = []
   const fileWrites = []
+  const errors = {}
 
   auth
-    .getUser('BhWZiGKHPYeoVELdo8D24jFA3rQ2')
+    .getUser(userId)
     .then(user => {
       const userEmailHandle = user.email.split('@')[0]
       // const workingDirectory = path.join(tmpdir, 'image')
 
       busboy.on('file', (fieldname, file, filename) => {
         const filepath = path.join(tmpdir, filename)
-        fileNames.push(filename)
+        const editedFilename = filename.split('.')[0]
+        fileNames.push(editedFilename)
 
         const writeStream = fs.createWriteStream(filepath)
         file.pipe(writeStream)
@@ -79,33 +81,39 @@ exports.uploadProfileImage = (req, res) => {
                         photoURL: `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/users%2F${tmpFileName}.jpg?alt=media&token=${token}`
                       })
                       .then(() => {
-                        return res.status(200).json({
-                          message: 'Image uploaded!'
+                        // Delete files in tmpdir
+                        fs.readdirSync(tmpdir).forEach(file => {
+                          console.log(file)
                         })
                       })
                       .catch(() => {
-                        console.log('Could not update user')
+                        errors['error'] = 'Could not update user'
                       })
                   })
                   .catch(() => {
-                    return res.status(500).json({
-                      message: 'Image not uploaded'
-                    })
+                    erros['error'] = 'Image not uploaded'
                   })
               })
               .catch(() => {
-                res.status(500).json({
-                  message: 'Image could not be resized.'
-                })
+                errors['error'] = 'Image could not be resized'
               })
           })
-          .catch(error => {
-            console.log(error)
+          .catch(() => {
+            errors['error'] = 'Could not resolve saving files to temp directory'
           })
       })
+
       busboy.end(req.rawBody)
+
+      return res.status(200).json({
+        message: 'Image uploaded!',
+        photoUrl: user.photoURL
+      })
     })
     .catch(() => {
-      return res.send('No user')
+      return res.status(500).json({
+        message: 'Image not uploaded',
+        errors: errors
+      })
     })
 }

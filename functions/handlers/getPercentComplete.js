@@ -4,7 +4,6 @@ exports.getPercentComplete = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
-    userId: data.userId,
     programs: data.programs
   }
 
