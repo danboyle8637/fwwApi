@@ -69,7 +69,7 @@ exports.uploadProfileImage = (req, res) => {
                     resumable: false,
                     uploadType: 'media',
                     metadata: {
-                      contentType: 'image/png',
+                      contentType: 'image/jpg',
                       metadata: {
                         firebaseStorageDownloadTokens: token
                       }
@@ -78,12 +78,14 @@ exports.uploadProfileImage = (req, res) => {
                   .then(() => {
                     auth
                       .updateUser(user.uid, {
-                        photoURL: `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/users%2F${tmpFileName}.jpg?alt=media&token=${token}`
+                        photoURL: `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/users%2F${tmpFileName}?alt=media&token=${token}`
                       })
                       .then(() => {
                         // Delete files in tmpdir
                         fs.readdirSync(tmpdir).forEach(file => {
-                          console.log(file)
+                          // Clean out the tmpdir once it's updataed
+                          // Use the unlink method to delete files
+                          fs.unlinkSync(tmpFilePath)
                         })
                       })
                       .catch(() => {
@@ -91,7 +93,7 @@ exports.uploadProfileImage = (req, res) => {
                       })
                   })
                   .catch(() => {
-                    erros['error'] = 'Image not uploaded'
+                    errors['error'] = 'Image not uploaded'
                   })
               })
               .catch(() => {
@@ -106,8 +108,7 @@ exports.uploadProfileImage = (req, res) => {
       busboy.end(req.rawBody)
 
       return res.status(200).json({
-        message: 'Image uploaded!',
-        photoUrl: user.photoURL
+        message: '😁 Image updated!'
       })
     })
     .catch(() => {

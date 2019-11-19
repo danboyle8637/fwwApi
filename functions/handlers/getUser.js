@@ -16,8 +16,7 @@ exports.getUser = (req, res) => {
         return res.status(200).json({
           message: 'Successfully got user',
           firstName: userData.firstName,
-          programs: userData.programs,
-          photoUrl: userData.photoUrl
+          programs: userData.programs
         })
       } else {
         auth.deleteUser(userId).then(() => {

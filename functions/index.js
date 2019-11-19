@@ -19,12 +19,14 @@ const { updateEmail } = require('./handlers/updateEmail')
 const { updatePassword } = require('./handlers/updatePassword')
 const { deleteAccount } = require('./handlers/deleteAccount')
 const { uploadProfileImage } = require('./handlers/uploadProfileImage')
+const { getUserPhotoUrl } = require('./handlers/getUserPhotoUrl')
 const handleImageUpload = require('./functions/handleImageUpload')
 
 const app = express()
 
 app.use(cors({ origin: true }))
 app.get('/get-user', Authorize, getUser)
+app.get('/get-user-photourl', Authorize, getUserPhotoUrl)
 
 app.post('/sign-up', signUp)
 app.post('/sign-up-social-account', signUpSocialAccount)
