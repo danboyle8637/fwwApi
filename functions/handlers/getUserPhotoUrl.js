@@ -1,18 +1,9 @@
-const auth = require('../utils/admin').auth
-
 exports.getUserPhotoUrl = (req, res) => {
-  const userId = req.userId
+  const userId = req.body.userId
+  const photoUrl = req.body.url
 
-  auth
-    .getUser(userId)
-    .then(user => {
-      return res.status(200).json({
-        photoUrl: user.photoURL
-      })
-    })
-    .catch(() => {
-      return res.status(500).json({
-        message: `Couldn't get your account.`
-      })
-    })
+  res.status(200).json({
+    message: '😁 Image Uploaded!',
+    photoUrl: photoUrl
+  })
 }

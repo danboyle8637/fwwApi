@@ -26,7 +26,7 @@ const app = express()
 
 app.use(cors({ origin: true }))
 app.get('/get-user', Authorize, getUser)
-app.get('/get-user-photourl', Authorize, getUserPhotoUrl)
+app.post('/get-user-photo-url', Authorize, uploadProfileImage, getUserPhotoUrl)
 
 app.post('/sign-up', signUp)
 app.post('/sign-up-social-account', signUpSocialAccount)
@@ -41,7 +41,6 @@ app.post('/add-program', Authorize, addProgram)
 app.post('/update-email', Authorize, updateEmail)
 app.post('/update-password', Authorize, updatePassword)
 app.delete('/delete-account', Authorize, deleteAccount)
-app.post('/upload-profile-image', Authorize, uploadProfileImage)
 
 exports.api = functions.https.onRequest(app)
 

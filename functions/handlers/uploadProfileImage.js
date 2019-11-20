@@ -9,7 +9,7 @@ const uuid = require('uuid/v4')
 
 const config = require('../fbconfig')
 
-exports.uploadProfileImage = (req, res) => {
+exports.uploadProfileImage = (req, res, next) => {
   const userId = req.userId
   const bucket = storage.bucket(config.storageBucket)
   const busboy = new Busboy({ headers: req.headers })
@@ -19,15 +19,16 @@ exports.uploadProfileImage = (req, res) => {
   // This would be for fields that are submitted
   const fields = {}
   // This is for images
+  const files = []
   const fileNames = []
   const fileWrites = []
   const errors = {}
+  const username = []
 
   auth
     .getUser(userId)
     .then(user => {
       const userEmailHandle = user.email.split('@')[0]
-      // const workingDirectory = path.join(tmpdir, 'image')
 
       busboy.on('file', (fieldname, file, filename) => {
         const filepath = path.join(tmpdir, filename)
@@ -63,57 +64,50 @@ exports.uploadProfileImage = (req, res) => {
               .resize(300, 300)
               .toFile(tmpFilePath)
               .then(() => {
-                bucket
-                  .upload(tmpFilePath, {
-                    destination: `users/${tmpFileName}`,
-                    resumable: false,
-                    uploadType: 'media',
+                return bucket.upload(tmpFilePath, {
+                  destination: `users/${tmpFileName}`,
+                  resumable: false,
+                  uploadType: 'media',
+                  metadata: {
+                    contentType: 'image/jpg',
                     metadata: {
-                      contentType: 'image/jpg',
-                      metadata: {
-                        firebaseStorageDownloadTokens: token
-                      }
+                      firebaseStorageDownloadTokens: token
                     }
-                  })
-                  .then(() => {
-                    auth
-                      .updateUser(user.uid, {
-                        photoURL: `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/users%2F${tmpFileName}?alt=media&token=${token}`
-                      })
-                      .then(() => {
-                        // Delete files in tmpdir
-                        fs.readdirSync(tmpdir).forEach(file => {
-                          // Clean out the tmpdir once it's updataed
-                          // Use the unlink method to delete files
-                          fs.unlinkSync(tmpFilePath)
-                        })
-                      })
-                      .catch(() => {
-                        errors['error'] = 'Could not update user'
-                      })
-                  })
-                  .catch(() => {
-                    errors['error'] = 'Image not uploaded'
-                  })
+                  }
+                })
               })
-              .catch(() => {
-                errors['error'] = 'Image could not be resized'
+              .then(() => {
+                try {
+                  console.log('Trying to delete file')
+                  fs.unlinkSync(tmpFilePath)
+                } catch (error) {
+                  res.status(500).json({
+                    message: 'Could not delete the temp file.'
+                  })
+                }
+
+                return auth.updateUser(userId, {
+                  photoURL: `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/users%2F${tmpFileName}?alt=media&token=${token}`
+                })
               })
+              .then(userRecord => {
+                console.log(userRecord.photoURL)
+                req.body = {
+                  url: userRecord.photoURL,
+                  userId: userId
+                }
+                next()
+              })
+              .catch(next)
           })
-          .catch(() => {
-            errors['error'] = 'Could not resolve saving files to temp directory'
-          })
+          .catch(next)
       })
 
       busboy.end(req.rawBody)
-
-      return res.status(200).json({
-        message: '😁 Image updated!'
-      })
     })
     .catch(() => {
       return res.status(500).json({
-        message: 'Image not uploaded',
+        message: 'Could not get user',
         errors: errors
       })
     })
