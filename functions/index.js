@@ -21,6 +21,7 @@ const { deleteAccount } = require('./handlers/deleteAccount')
 const { uploadProfileImage } = require('./handlers/uploadProfileImage')
 const { addMemberToSendGrid } = require('./handlers/addMemberToSendGrid')
 const { getUserPhotoUrl } = require('./handlers/getUserPhotoUrl')
+const { getConvertKitTags } = require('./sendgrid/getConvertKitTags')
 
 const app = express()
 
@@ -48,6 +49,8 @@ exports.api = functions.https.onRequest(app)
 
 // This is a function to handle the contact form on FWW Marketing Site
 exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
+
+exports.getConvertKitTags = functions.https.onRequest(getConvertKitTags)
 
 // exports.addMemberToSendGrid = functions.firestore
 //   .document('users/{userId}')
