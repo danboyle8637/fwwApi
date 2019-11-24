@@ -17,7 +17,7 @@ exports.updatePassword = (req, res) => {
 
   if (!passwordsEqual) {
     return res.status(400).json({
-      message: "😢 Passwords don't equal."
+      message: "😢 Passwords don't match."
     })
   } else {
     auth
