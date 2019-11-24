@@ -2,7 +2,10 @@ const functions = require('firebase-functions')
 const express = require('express')
 const cors = require('cors')
 
-const fwwContactPage = require('./sendgrid/fww-contact-page')
+const { handleFWWContactPage } = require('./sendgrid/handleFWWContactPage')
+const {
+  handleAddContactToSendGrid
+} = require('./sendgrid/handleAddContactToSendGrid')
 const { Authorize } = require('./middleware/Authorize')
 const { signUp } = require('./handlers/signUp')
 const { signUpSocialAccount } = require('./handlers/signUpSocialAccount')
@@ -20,7 +23,6 @@ const { updatePassword } = require('./handlers/updatePassword')
 const { deleteAccount } = require('./handlers/deleteAccount')
 const { uploadProfileImage } = require('./handlers/uploadProfileImage')
 const { getUserPhotoUrl } = require('./handlers/getUserPhotoUrl')
-const handleImageUpload = require('./functions/handleImageUpload')
 
 const app = express()
 
@@ -42,32 +44,16 @@ app.post('/update-email', Authorize, updateEmail)
 app.post('/update-password', Authorize, updatePassword)
 app.delete('/delete-account', Authorize, deleteAccount)
 
+// This is my REST-ish app for talking to my database
 exports.api = functions.https.onRequest(app)
 
-exports.fwwContactPage = functions.https.onRequest(fwwContactPage)
-exports.imageUploadAndResize = functions.https.onRequest(handleImageUpload)
+// This is a function to handle the contact form on FWW Marketing Site
+exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
 
-// exports.updatePercentComplete = functions.firestore
-//   .document('/users/{username}/{programId}/{workoutId}')
-//   .onUpdate((change, context) => {
-//     console.log(context)
-//     const newDocValue = change.after.data()
-//     //const prevDocValue = change.before.data()
+exports.getSendGridLists = functions.https.onRequest(handleAddContactToSendGrid)
 
-//     const isCompleteFirstTime = newDocValue.completed.complete1.isComplete
-
-//     const username = context.username
-//     const programId = context.programId
-
-//     const increment = firebase.firestore.FieldValue.increment(1)
-
-//     if (isCompleteFirstTime === true) {
-//       db.collection('/users')
-//         .doc(username)
-//         .collection(programId)
-//         .doc('PercentComplete')
-//         .update({
-//           workoutsCompleted: increment
-//         })
-//     }
+// exports.addMemberToSendGrid = functions.firestore
+//   .document('users/{userId}')
+//   .onCreate((snapshot, context) => {
+//     const userData = snapshot.data()
 //   })
