@@ -2,7 +2,6 @@ const functions = require('firebase-functions')
 const express = require('express')
 const cors = require('cors')
 
-const { handleFWWContactPage } = require('./sendgrid/handleFWWContactPage')
 const { Authorize } = require('./middleware/Authorize')
 const { signUp } = require('./handlers/signUp')
 const { signUpSocialAccount } = require('./handlers/signUpSocialAccount')
@@ -21,13 +20,15 @@ const { deleteAccount } = require('./handlers/deleteAccount')
 const { uploadProfileImage } = require('./handlers/uploadProfileImage')
 const { addMemberToSendGrid } = require('./handlers/addMemberToSendGrid')
 const { getUserPhotoUrl } = require('./handlers/getUserPhotoUrl')
-const { getConvertKitTags } = require('./sendgrid/getConvertKitTags')
+const { ckAddResetMember } = require('./handlers/ckAddResetMember')
+const { ckNotFinishResetSignUp } = require('./handlers/ckNotFinishResetSignUp')
+const { ckAddReviewer } = require('./handlers/ckAddReviewer')
+const { handleResetContactForm } = require('./handlers/handleResetContactForm')
 
 const app = express()
 
 app.use(cors({ origin: true }))
 app.get('/get-user', Authorize, getUser)
-app.post('/get-user-photo-url', Authorize, uploadProfileImage, getUserPhotoUrl)
 
 app.post('/sign-up', signUp)
 app.post('/sign-up-social-account', signUpSocialAccount)
@@ -41,16 +42,22 @@ app.post('/toggle-favorite', Authorize, postFavorite)
 app.post('/add-program', Authorize, addProgram)
 app.post('/update-email', Authorize, updateEmail)
 app.post('/update-password', Authorize, updatePassword)
-app.delete('/delete-account', Authorize, deleteAccount)
 app.post('/add-member-to-sendgrid', addMemberToSendGrid)
+app.post('/get-user-photo-url', Authorize, uploadProfileImage, getUserPhotoUrl)
+app.post('/not-finish-reset-signup', ckNotFinishResetSignUp)
+app.post('/add-member-to-convertkit', ckAddResetMember)
+app.post('/add-reset-reviewer', ckAddReviewer)
+app.post('/reset-contact-form', handleResetContactForm)
+
+app.delete('/delete-account', Authorize, deleteAccount)
 
 // This is my REST-ish app for talking to my database
 exports.api = functions.https.onRequest(app)
 
 // This is a function to handle the contact form on FWW Marketing Site
-exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
+//exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
 
-exports.getConvertKitTags = functions.https.onRequest(getConvertKitTags)
+//exports.getConvertKitTags = functions.https.onRequest(getConvertKitTags)
 
 // exports.addMemberToSendGrid = functions.firestore
 //   .document('users/{userId}')
