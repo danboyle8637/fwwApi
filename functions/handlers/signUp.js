@@ -137,8 +137,6 @@ exports.signUp = (req, res) => {
           firstName: cleanUserInfo.firstName,
           programs: [cleanUserInfo.programId],
           biggestObstacle: cleanUserInfo.biggestObstacle,
-          photoUrl: baseAvatarImage,
-          photoUrlTiny: baseAvatarImageTiny,
           createdAt: new Date().toLocaleDateString()
         }
 
