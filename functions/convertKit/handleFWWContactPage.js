@@ -4,9 +4,12 @@ require('dotenv').config({
 const sgMail = require('@sendgrid/mail')
 
 exports.handleFWWContactPage = (req, res) => {
+  res.set('Access-Control-Allow-Origin', 'http://localhost:8000')
+  res.set('Access-Control-Allow-Methods', 'POST')
+
   sgMail.setApiKey(process.env.SEND_GRID_KEY)
 
-  const data = JSON.parse(body.req)
+  const data = JSON.parse(req.body)
 
   const request = {
     firstName: data.firstName,

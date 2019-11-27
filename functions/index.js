@@ -24,6 +24,7 @@ const { ckAddResetMember } = require('./handlers/ckAddResetMember')
 const { ckNotFinishResetSignUp } = require('./handlers/ckNotFinishResetSignUp')
 const { ckAddReviewer } = require('./handlers/ckAddReviewer')
 const { handleResetContactForm } = require('./handlers/handleResetContactForm')
+const { handleFWWContactPage } = require('./convertKit/handleFWWContactPage')
 
 const app = express()
 
@@ -55,7 +56,7 @@ app.delete('/delete-account', Authorize, deleteAccount)
 exports.api = functions.https.onRequest(app)
 
 // This is a function to handle the contact form on FWW Marketing Site
-//exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
+exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
 
 //exports.getConvertKitTags = functions.https.onRequest(getConvertKitTags)
 
