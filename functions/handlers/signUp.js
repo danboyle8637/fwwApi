@@ -5,7 +5,6 @@ const config = require('../fbconfig')
 const {
   checkIsEmail,
   checkIsEmpty,
-  cleanAndCheckUsername,
   confirmPasswordsEqual,
   formatNames
 } = require('../utils/formatValidate')
@@ -37,22 +36,17 @@ exports.signUp = (req, res) => {
     userInfo.confirmPassword
   )
   const formattedFirstName = formatNames(userInfo.firstName)
-  const formattedUsername = cleanAndCheckUsername(userInfo.username)
 
   if (isFirstNameEmpty) {
-    errors.firstName = 'Enter your first name.'
-  }
-
-  if (formattedUsername === false) {
-    errors.username = 'Check your username.'
+    errors.firstName = 'First name is blank.'
   }
 
   if (isPasswordEmpty) {
-    errors.password = 'Create a password.'
+    errors.password = 'Password is blank.'
   }
 
   if (!isEmailValid) {
-    errors.email = 'Enter valid email address.'
+    errors.email = 'Email is not valid.'
   }
 
   if (!passwordsEqual) {
@@ -82,7 +76,7 @@ exports.signUp = (req, res) => {
 
   // Step 1: Get newly created user
   auth.getUser(cleanUserInfo.userId).then(userCredential => {
-    // Step 2: Does username already exist?
+    // Step 2: Does user already exist?
     const userId = userCredential.uid
     const baseAvatarImage = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media`
     const baseAvatarImageTiny = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar-tiny.jpg?alt=media`
@@ -92,7 +86,7 @@ exports.signUp = (req, res) => {
       .get()
       .then(userDoc => {
         if (userDoc.exists) {
-          // the username already exists. Return error.
+          // the user already exists. Return error.
           return res.status(400).json({
             error: `Account, already exists. Try again.`
           })
