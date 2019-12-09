@@ -26,12 +26,15 @@ const { ckAddReviewer } = require('./handlers/ckAddReviewer')
 const { handleResetContactForm } = require('./handlers/handleResetContactForm')
 const { handleFWWContactPage } = require('./convertKit/handleFWWContactPage')
 const { testEndpoint } = require('./handlers/testEndpoint')
+const {
+  emergencyCompleteSignUp
+} = require('./handlers/emergencyCreateUserData')
 
 const app = express()
 
 app.use(cors({ origin: true }))
 app.get('/get-user', Authorize, getUser)
-app.get('/test-endpoint', testEndpoint)
+app.post('/test-endpoint', testEndpoint)
 
 app.post('/sign-up', signUp)
 app.post('/sign-up-social-account', signUpSocialAccount)
@@ -51,6 +54,7 @@ app.post('/not-finish-reset-signup', ckNotFinishResetSignUp)
 app.post('/add-member-to-convertkit', ckAddResetMember)
 app.post('/add-reset-reviewer', ckAddReviewer)
 app.post('/reset-contact-form', handleResetContactForm)
+app.post('/emergency-create-user', emergencyCompleteSignUp)
 
 app.delete('/delete-account', Authorize, deleteAccount)
 

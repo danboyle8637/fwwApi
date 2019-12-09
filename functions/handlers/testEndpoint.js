@@ -1,6 +1,6 @@
 const {
   emergencyFirestoreSignUp
-} = require('../utils/emergencyFirestoreSignUp')
+} = require('../helperFunctions/emergencyFirestoreSignUp')
 
 exports.testEndpoint = (req, res) => {
   const request = {
@@ -14,7 +14,11 @@ exports.testEndpoint = (req, res) => {
     biggestObstacle: req.body.biggestObstacle
   }
 
-  const firestoreResult = emergencyFirestoreSignUp(request)
-
-  res.send(firestoreResult)
+  emergencyFirestoreSignUp(request)
+    .then(data => {
+      res.send(data)
+    })
+    .catch(error => {
+      res.send(error)
+    })
 }
