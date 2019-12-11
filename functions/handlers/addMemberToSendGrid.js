@@ -16,7 +16,6 @@ exports.addMemberToSendGrid = (req, res) => {
     program: req.body.program
   }
 
-  // TODO Format the data so it's in the right casing
   const firstName = reqObj.firstName
   const email = reqObj.email
   const program = reqObj.program
