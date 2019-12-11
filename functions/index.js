@@ -25,7 +25,6 @@ const { ckNotFinishResetSignUp } = require('./handlers/ckNotFinishResetSignUp')
 const { ckAddReviewer } = require('./handlers/ckAddReviewer')
 const { handleResetContactForm } = require('./handlers/handleResetContactForm')
 const { handleFWWContactPage } = require('./convertKit/handleFWWContactPage')
-const { testEndpoint } = require('./handlers/testEndpoint')
 const {
   emergencyCompleteSignUp
 } = require('./handlers/emergencyCreateUserData')
@@ -34,7 +33,6 @@ const app = express()
 
 app.use(cors({ origin: true }))
 app.get('/get-user', Authorize, getUser)
-app.post('/test-endpoint', testEndpoint)
 
 app.post('/sign-up', signUp)
 app.post('/sign-up-social-account', signUpSocialAccount)

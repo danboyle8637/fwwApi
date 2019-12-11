@@ -30,11 +30,12 @@ exports.ckAddResetMember = (req, res) => {
   const listTagsUrl = `${baseUrl}/tags?api_key=${apiKey}`
   let reqBody = {}
 
+  // TODO Remember that you misspelled the formattedEmail below!
   if (isEmail) {
     reqBody = {
       api_key: apiKey,
       first_name: formattedName,
-      email: formattedEmail,
+      email: formattedEmaill,
       fields: {
         biggest_obstacle: biggestObstacle
       }

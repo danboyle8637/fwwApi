@@ -1,39 +1,35 @@
-/*
-This endpoint will take a signed in user and if they had an error when they signed
-so that their account was created but none of their data was setup in the database...
-
-This endpoint will check if they have a doc... and if not it will set them up correctly.
-*/
-const db = require('../utils/admin').db
-const fetch = require('node-fetch')
-
 const { isInFirestore } = require('../helperFunctions/isInFirestore')
 const { isInConvertKit } = require('../helperFunctions/isInConvertKit')
+const {
+  emergencyConvertKitSignUp
+} = require('../helperFunctions/emergencyConvertKitSignUp')
+const {
+  emergencyFirestoreSignUp
+} = require('../helperFunctions/emergencyFirestoreSignUp')
 const { checkIsEmail, formatNames } = require('../utils/formatValidate')
 
 exports.emergencyCompleteSignUp = (req, res) => {
-  // Step 1: Get the userId
+  const data = JSON.parse(req.body)
+
   const request = {
-    userId: req.body.userId,
-    programId: req.body.programId,
-    totalWorkouts: req.body.totalWorkouts,
-    firstName: req.body.firstName,
-    password: req.body.password,
-    confirmPassword: req.body.confirmPassword,
-    email: req.body.email,
-    biggestObstacle: req.body.biggestObstacle
+    userId: data.userId,
+    programId: data.programId,
+    totalWorkouts: data.totalWorkouts,
+    firstName: data.firstName,
+    password: data.password,
+    confirmPassword: data.confirmPassword,
+    email: data.email,
+    biggestObstacle: data.biggestObstacle
   }
 
   const userId = request.userId
+  const programId = request.programId
+  const totalWorkouts = request.totalWorkouts
   const firstName = request.firstName
+  const password = request.password
+  const confirmPassword = request.confirmPassword
   const email = request.email
   const biggestObstacle = request.biggestObstacle
-
-  const ckApiSecret = process.env.CONVERT_KIT_SECRET
-  const ckApiKey = process.env.CONVERT_KIT_KEY
-  const ckBaseUrl = process.env.CONVERT_KIT_BASE_ENDPOINT
-  const ckFindMemberUrl = `${ckBaseUrl}/subscribers?api_secret=${ckApiSecret}&email_address=${email}`
-  const ckListTagsUrl = `${ckBaseUrl}/tags?api_key=${ckApiKey}`
 
   // Format the data so it gets set correctly
   const isEmail = checkIsEmail(email)
@@ -48,13 +44,15 @@ exports.emergencyCompleteSignUp = (req, res) => {
     })
   }
 
-  const ckReqBody = {
-    api_key: ckApiKey,
-    first_name: formattedFirstName,
+  const cleanUserData = {
+    userId: userId,
+    programId: programId,
+    totalWorkouts: totalWorkouts,
+    firstName: formattedFirstName,
+    password: password,
+    confirmPassword: confirmPassword,
     email: formattedEmail,
-    fields: {
-      biggest_obstacle: biggestObstacle
-    }
+    biggestObstacle: biggestObstacle
   }
 
   // Step 2: Find out which fetch call failed... signup endpoint or convertKit
@@ -67,75 +65,71 @@ exports.emergencyCompleteSignUp = (req, res) => {
       const inFirestore = dataArray[0]
       const inConvertKit = dataArray[1]
 
-      console.log(`Firestore: ${inFirestore}`)
-      console.log(`ConvertKit: ${inConvertKit}`)
+      console.log(inFirestore)
+      console.log(inConvertKit)
+
+      // Both fail
+      if (!inFirestore && !inConvertKit) {
+        emergencyFirestoreSignUp(cleanUserData)
+          .then(result => {
+            if (result.status === 200) {
+              emergencyConvertKitSignUp(cleanUserData)
+                .then(() => {
+                  res.status(200).json({
+                    message: 'Account created!'
+                  })
+                })
+                .catch(error => {
+                  res.status(500).json({
+                    message: `Could not get you signed up to our member email list. Don't miss out on member updates and specials. Email us so we can make sure you are set up correctly.`,
+                    error: error.message
+                  })
+                })
+            }
+          })
+          .catch(error => {
+            res.status(500).json({
+              message:
+                'There was an error getting your account created. Please contact us so we can help make sure you are set up correctly. Sorry for the issue.',
+              error: error
+            })
+          })
+      } else if (inFirestore && !inConvertKit) {
+        emergencyConvertKitSignUp(cleanUserData)
+          .then(() => {
+            res.status(200).json({
+              message: 'Account added!'
+            })
+          })
+          .catch(error => {
+            res.status(500).json({
+              message: `Could not get you signed up to our member email list. Don't miss out on member updates and specials. Email us so we can make sure you are set up correctly.`,
+              error: error.message
+            })
+          })
+      } else if (!inFirestore && inConvertKit) {
+        emergencyFirestoreSignUp(cleanUserData)
+          .then(() => {
+            res.status(200).json({
+              message: 'Account setup in database!'
+            })
+          })
+          .catch(() => {
+            res.status(500).json({
+              message:
+                'There was an error getting your account created. Please contact us so we can help make sure you are set up correctly. Sorry for the issue.'
+            })
+          })
+      } else {
+        res.status(400).json({
+          message:
+            'You should never be reading this message. If you are, please contact us immediately!'
+        })
+      }
     })
-    .catch(error => {
-      console.log(error)
+    .catch(() => {
+      res.status(500).json({
+        message: `Network issues kept us from setting up your account correctly. Contact us and we'll help you get setup so you can workout!`
+      })
     })
-
-  // 1) Check if the userDoc exists
-  // db.collection('users')
-  //   .doc(userId)
-  //   .get()
-  //   .then(docSnapshot => {
-  //     const userDocExists = docSnapshot.exists
-  //     const userData = docSnapshot.data()
-  //     const program = userData.programs[0]
-
-  //     if (userDocExists) {
-  //       // 2) check convertKit
-  //       fetch(ckFindMemberUrl, {
-  //         method: 'GET'
-  //       })
-  //         .then(response => response.json())
-  //         .then(subscriberData => {
-  //           if (subscriberData.total_subscribers > 0) {
-  //             // This should NEVER happen
-  //             res.status(400).json({
-  //               message:
-  //                 'Something went wrong. Contact us with the email address you used to sign up so we can help get your account set up correctly.'
-  //             })
-  //           } else {
-  //             // add them to ConvertKit with the right tag
-  //             fetch(ckListTagsUrl, {
-  //               method: 'GET'
-  //             })
-  //               .then(response => response.json())
-  //               .then(tagData => {
-  //                 const tagArray = tagData.tags
-  //                 const newUserTag = tagArray.find(tag => tag.name === program)
-  //                 const tagId = newUserTag.id
-  //                 const subscribeUserUrl = `${ckBaseUrl}/tags/${tagId}/subscribe`
-
-  //                 fetch(subscribeUserUrl, {
-  //                   method: 'POST',
-  //                   headers: {
-  //                     'Content-Type': 'application/json'
-  //                   },
-  //                   body: ckReqBody
-  //                 })
-  //                   .then(response => response.json())
-  //                   .then(() => {
-  //                     res.status(200).json({
-  //                       message: `success`
-  //                     })
-  //                   })
-  //                   .catch(() => {
-  //                     res.status(500).json({
-  //                       message:
-  //                         'There seems to be a network issue. Please contact us if you see this error message with the email you used to sign up. We will make sure your account is correct.'
-  //                     })
-  //                   })
-  //               })
-  //           }
-  //         })
-  //     } else {
-  //       emergencyFirestoreSignUp().then(data => {})
-  //     }
-  //   })
-
-  // Step 3: Make the update to the user account...
-
-  // Step 4: Send back the all is good message
 }

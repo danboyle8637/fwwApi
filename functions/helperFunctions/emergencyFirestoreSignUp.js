@@ -70,7 +70,7 @@ exports.emergencyFirestoreSignUp = requestBody => {
       const baseAvatarImageTiny = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar-tiny.jpg?alt=media`
 
       db.collection('users')
-        .doc(cleanUserInfo.userId)
+        .doc(userId)
         .get()
         .then(userDoc => {
           if (userDoc.exists) {
@@ -154,7 +154,7 @@ exports.emergencyFirestoreSignUp = requestBody => {
                             programArray.push(cleanUserInfo.programId)
 
                             const success = {
-                              status: 201,
+                              status: 200,
                               success: `💪 Account created. Congrats!`,
                               firstName: cleanUserInfo.firstName,
                               photoUrl: baseAvatarImage,
