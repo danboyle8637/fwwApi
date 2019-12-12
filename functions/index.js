@@ -18,7 +18,6 @@ const { updateEmail } = require('./handlers/updateEmail')
 const { updatePassword } = require('./handlers/updatePassword')
 const { deleteAccount } = require('./handlers/deleteAccount')
 const { uploadProfileImage } = require('./handlers/uploadProfileImage')
-// const { addMemberToSendGrid } = require('./handlers/addMemberToSendGrid')
 const { getUserPhotoUrl } = require('./handlers/getUserPhotoUrl')
 const { ckAddResetMember } = require('./handlers/ckAddResetMember')
 const { ckNotFinishResetSignUp } = require('./handlers/ckNotFinishResetSignUp')
@@ -28,11 +27,15 @@ const { handleFWWContactPage } = require('./convertKit/handleFWWContactPage')
 const {
   emergencyCompleteSignUp
 } = require('./handlers/emergencyCreateUserData')
+const {
+  emergencySocialCompleteSignUp
+} = require('./handlers/emergencySocialCreateUserData')
 
 const app = express()
 
 app.use(cors({ origin: true }))
 app.get('/get-user', Authorize, getUser)
+app.get('/delete-account', Authorize, deleteAccount)
 
 app.post('/sign-up', signUp)
 app.post('/sign-up-social-account', signUpSocialAccount)
@@ -46,26 +49,16 @@ app.post('/toggle-favorite', Authorize, postFavorite)
 app.post('/add-program', Authorize, addProgram)
 app.post('/update-email', Authorize, updateEmail)
 app.post('/update-password', Authorize, updatePassword)
-// app.post('/add-member-to-sendgrid', addMemberToSendGrid)
 app.post('/get-user-photo-url', Authorize, uploadProfileImage, getUserPhotoUrl)
 app.post('/not-finish-reset-signup', ckNotFinishResetSignUp)
 app.post('/add-member-to-convertkit', ckAddResetMember)
 app.post('/add-reset-reviewer', ckAddReviewer)
 app.post('/reset-contact-form', handleResetContactForm)
 app.post('/emergency-create-user', emergencyCompleteSignUp)
-
-app.delete('/delete-account', Authorize, deleteAccount)
+app.post('/emergency-social-create-user', emergencySocialCompleteSignUp)
 
 // This is my REST-ish app for talking to my database
 exports.api = functions.https.onRequest(app)
 
 // This is a function to handle the contact form on FWW Marketing Site
 exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
-
-//exports.getConvertKitTags = functions.https.onRequest(getConvertKitTags)
-
-// exports.addMemberToSendGrid = functions.firestore
-//   .document('users/{userId}')
-//   .onCreate((snapshot, context) => {
-//     const userData = snapshot.data()
-//   })

@@ -1,17 +1,15 @@
 const db = require('../utils/admin').db
 const auth = require('../utils/admin').auth
 
-const config = require('../fbconfig')
-
-exports.emergencyFirestoreSignUp = requestBody => {
+exports.emergencySocialFirestoreSignUp = requestBody => {
   const cleanUserInfo = {
     userId: requestBody.userId,
     programId: requestBody.programId,
     totalWorkouts: requestBody.totalWorkouts,
     firstName: formattedFirstName,
-    password: requestBody.password,
     email: requestBody.email.toLowerCase(),
-    biggestObstacle: requestBody.biggestObstacle
+    biggestObstacle: requestBody.biggestObstacle,
+    photoUrl: photoURL
   }
 
   return new Promise((resolve, reject) => {
@@ -19,8 +17,6 @@ exports.emergencyFirestoreSignUp = requestBody => {
     auth.getUser(cleanUserInfo.userId).then(userCredential => {
       // Step 2: Does user already exist?
       const userId = userCredential.uid
-      const baseAvatarImage = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media`
-      const baseAvatarImageTiny = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar-tiny.jpg?alt=media`
 
       db.collection('users')
         .doc(userId)
@@ -41,7 +37,7 @@ exports.emergencyFirestoreSignUp = requestBody => {
                 email: cleanUserInfo.email,
                 password: cleanUserInfo.password,
                 displayName: cleanUserInfo.firstName,
-                photoURL: baseAvatarImage
+                photoURL: cleanUserInfo.photoUrl
               })
               .then(() => {
                 // Step 4: Set customClaims on user to use with site access.

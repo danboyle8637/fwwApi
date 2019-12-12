@@ -127,8 +127,7 @@ exports.handleWorkoutTracking = (req, res) => {
         const statsWorkoutArray = docsArray.filter(element => {
           return element.totalWorkouts !== 5
         })
-        // TODO You need to decide how you want the dats in client state to be
-        // That is what you will construct here and send back
+
         const stats = statsWorkoutArray.reduce((accumulator, currentValue) => {
           const complete1 = currentValue.completed.complete1
           const complete2 = currentValue.completed.complete2

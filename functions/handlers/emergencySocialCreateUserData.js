@@ -4,11 +4,11 @@ const {
   emergencyConvertKitSignUp
 } = require('../helperFunctions/emergencyConvertKitSignUp')
 const {
-  emergencyFirestoreSignUp
-} = require('../helperFunctions/emergencyFirestoreSignUp')
-const { checkIsEmail, formatNames } = require('../utils/formatValidate')
+  emergencySocialFirestoreSignUp
+} = require('../helperFunctions/emergencySocialFirestoreSignUp')
+const { formatNames, checkIsEmpty } = require('../utils/formatValidate')
 
-exports.emergencyCompleteSignUp = (req, res) => {
+exports.emergencySocialCompleteSignUp = (req, res) => {
   const data = JSON.parse(req.body)
 
   const request = {
@@ -16,45 +16,29 @@ exports.emergencyCompleteSignUp = (req, res) => {
     programId: data.programId,
     totalWorkouts: data.totalWorkouts,
     firstName: data.firstName,
-    password: data.password,
-    confirmPassword: data.confirmPassword,
     email: data.email,
-    biggestObstacle: data.biggestObstacle
+    biggestObstacle: data.biggestObstacle,
+    photoUrl: photoUrl
   }
 
   const userId = request.userId
   const programId = request.programId
   const totalWorkouts = request.totalWorkouts
   const firstName = request.firstName
-  const password = request.password
-  const confirmPassword = request.confirmPassword
   const email = request.email
   const biggestObstacle = request.biggestObstacle
+  const photoUrl = request.photoUrl
 
-  // Format and validate userInfo
+  // Format the data so it gets set correctly
   let errors = {}
 
-  const isPasswordEmpty = checkIsEmpty(password)
+  const isFirstNameEmpty = checkIsEmpty(firstName)
   const isBiggestObstacleEmpty = checkIsEmpty(biggestObstacle)
-  const passwordsEqual = confirmPasswordsEqual(password, confirmPassword)
-  const isEmail = checkIsEmail(email)
   const formattedEmail = email.toLowerCase()
   const formattedFirstName = formatNames(firstName)
 
   if (isFirstNameEmpty) {
     errors.firstName = 'First name is blank.'
-  }
-
-  if (isPasswordEmpty) {
-    errors.password = 'Password is blank.'
-  }
-
-  if (!isEmailValid) {
-    errors.email = 'Email is not valid.'
-  }
-
-  if (!passwordsEqual) {
-    errors.passwordsEqual = "Passwords don't match. Try again."
   }
 
   if (isBiggestObstacleEmpty) {
@@ -63,17 +47,9 @@ exports.emergencyCompleteSignUp = (req, res) => {
 
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({
-      message:
-        'You have some errors with the data that was sent over. Here are the details...',
+      status: 400,
+      message: 'Input validation errors',
       errors: errors
-    })
-  }
-
-  if (!isEmail) {
-    // email address not valid. Send back. Should not happen.
-    res.status(400).json({
-      message:
-        'Your email address is not passing validation checks. Please contact us with the email you used to sign up so we can help get your account set up correctly.'
     })
   }
 
@@ -82,10 +58,9 @@ exports.emergencyCompleteSignUp = (req, res) => {
     programId: programId,
     totalWorkouts: totalWorkouts,
     firstName: formattedFirstName,
-    password: password,
-    confirmPassword: confirmPassword,
     email: formattedEmail,
-    biggestObstacle: biggestObstacle
+    biggestObstacle: biggestObstacle,
+    photoUrl: photoUrl
   }
 
   // Step 2: Find out which fetch call failed... signup endpoint or convertKit
@@ -100,7 +75,7 @@ exports.emergencyCompleteSignUp = (req, res) => {
 
       // Both fail
       if (!inFirestore && !inConvertKit) {
-        emergencyFirestoreSignUp(cleanUserData)
+        emergencySocialFirestoreSignUp(cleanUserData)
           .then(result => {
             if (result.status === 200) {
               emergencyConvertKitSignUp(cleanUserData)
