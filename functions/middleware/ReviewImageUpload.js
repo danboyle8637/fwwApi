@@ -9,7 +9,7 @@ const uuid = require('uuid/v4')
 
 const config = require('../fbconfig')
 
-exports.uploadProfileImage = (req, res, next) => {
+exports.ReviewImageUpload = (req, res, next) => {
   const userId = req.userId
   const bucket = storage.bucket(config.storageBucket)
   const busboy = new Busboy({ headers: req.headers })
@@ -65,7 +65,7 @@ exports.uploadProfileImage = (req, res, next) => {
               .toFile(tmpFilePath)
               .then(() => {
                 return bucket.upload(tmpFilePath, {
-                  destination: `users/${tmpFileName}`,
+                  destination: `reviews/${tmpFileName}`,
                   resumable: false,
                   uploadType: 'media',
                   metadata: {
@@ -85,16 +85,13 @@ exports.uploadProfileImage = (req, res, next) => {
                   })
                 }
 
-                return auth.updateUser(userId, {
-                  photoURL: `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/users%2F${tmpFileName}?alt=media&token=${token}`
-                })
-              })
-              .then(userRecord => {
-                console.log(userRecord.photoURL)
+                const selfieUrl = `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/reviews%2F${tmpFileName}?alt=media&token=${token}`
+
                 req.body = {
-                  url: userRecord.photoURL,
-                  userId: userId
+                  userId: userId,
+                  selfie: selfieUrl
                 }
+
                 next()
               })
               .catch(next)
