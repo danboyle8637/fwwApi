@@ -1,6 +1,10 @@
+require('dotenv').config({
+  path: `.env`
+})
 const functions = require('firebase-functions')
 const express = require('express')
 const cors = require('cors')
+const sgMail = require('@sendgrid/mail')
 
 const { Authorize } = require('./middleware/Authorize')
 const { signUp } = require('./handlers/signUp')
@@ -65,3 +69,29 @@ exports.api = functions.https.onRequest(app)
 
 // This is a function to handle the contact form on FWW Marketing Site
 exports.fwwContactPage = functions.https.onRequest(handleFWWContactPage)
+
+exports.emailFWWReview = functions.firestore
+  .document('reviews/{userId}')
+  .onCreate((snapshot, context) => {
+    sgMail.setApiKey(process.env.SEND_GRID_KEY)
+    const docData = snapshot.data()
+    const firstName = docData.firstName
+    const stars = docData.stars
+    const review = docData.review
+
+    const emailMessage = {
+      to: 'kindal@fitwomensweekly.net',
+      from: 'fww@fitwomensweekly.net',
+      templateId: 'd-498a71e057cc4926b563e1d59b605427',
+      dynamic_template_data: {
+        firstName: firstName,
+        stars: stars,
+        review: review
+      }
+    }
+
+    sgMail
+      .send(emailMessage)
+      .then(() => {})
+      .catch(() => {})
+  })

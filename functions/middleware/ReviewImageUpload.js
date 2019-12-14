@@ -17,7 +17,7 @@ exports.ReviewImageUpload = (req, res, next) => {
   const tmpdir = os.tmpdir()
 
   // This would be for fields that are submitted
-  const fields = {}
+  const reviewData = {}
   // This is for images
   const files = []
   const fileNames = []
@@ -29,6 +29,20 @@ exports.ReviewImageUpload = (req, res, next) => {
     .getUser(userId)
     .then(user => {
       const userEmailHandle = user.email.split('@')[0]
+
+      busboy.on(
+        'field',
+        (
+          fieldname,
+          val,
+          fieldnameTruncated,
+          valTruncated,
+          encoding,
+          mimetype
+        ) => {
+          reviewData[fieldname] = JSON.parse(val)
+        }
+      )
 
       busboy.on('file', (fieldname, file, filename) => {
         const filepath = path.join(tmpdir, filename)
@@ -87,9 +101,10 @@ exports.ReviewImageUpload = (req, res, next) => {
 
                 const selfieUrl = `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/reviews%2F${tmpFileName}?alt=media&token=${token}`
 
-                req.body = {
+                req.selfie = {
                   userId: userId,
-                  selfie: selfieUrl
+                  selfie: selfieUrl,
+                  review: reviewData
                 }
 
                 next()

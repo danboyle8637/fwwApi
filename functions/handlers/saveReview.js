@@ -5,24 +5,15 @@ const fetch = require('node-fetch')
 const db = require('../utils/admin').db
 
 exports.saveReview = (req, res) => {
-  // const data = JSON.parse(req.body)
-
   const apiKey = process.env.CONVERT_KIT_KEY
   const baseUrl = process.env.CONVERT_KIT_BASE_ENDPOINT
 
-  const request = {
-    stars: req.body.stars,
-    firstName: req.body.firstName,
-    email: req.body.email,
-    review: req.body.review
-  }
-
-  const userId = req.body.userId
-  const stars = request.stars
-  const firstName = request.firstName
-  const email = request.email
-  const review = request.review
-  const selfie = req.body.selfie
+  const userId = req.selfie.userId
+  const stars = req.selfie.review.reviewBody.stars
+  const firstName = req.selfie.review.reviewBody.firstName
+  const email = req.selfie.review.reviewBody.email
+  const review = req.selfie.review.reviewBody.review
+  const selfie = req.selfie.selfie
 
   const getTagsUrl = `${baseUrl}/tags?api_key=${apiKey}`
 
