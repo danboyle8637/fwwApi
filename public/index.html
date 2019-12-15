@@ -1,65 +1,241 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
-
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/6.3.5/firebase-app.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/6.3.5/firebase-auth.js"></script>
-    <script defer src="/__/firebase/6.3.5/firebase-database.js"></script>
-    <script defer src="/__/firebase/6.3.5/firebase-messaging.js"></script>
-    <script defer src="/__/firebase/6.3.5/firebase-storage.js"></script>
-    <!-- initialize the SDK after all desired features are loaded -->
-    <script defer src="/__/firebase/init.js"></script>
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to Fit Women's Weekly Reset API Management</title>
     <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #141414;
+        color: rgba(0, 0, 0, 0.87);
+        font-family: Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .api-main {
+        margin: 0;
+        padding: 0;
+        background: #101010;
+        width: 100%;
+        max-width: 75rem;
+      }
+      .api-wrapper {
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        background: #19191c;
+        width: 100%;
+        overflow: hidden;
+      }
+      .kindal-background {
+        grid-column: 1 / -1;
+        grid-row: 1 / -1;
+        width: 100%;
+      }
+      .api-content-wrapper {
+        padding: 0 12px;
+        grid-column: 1 / -1;
+        grid-row: 1 / -1;
+        align-self: center;
+        justify-self: end;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60%;
+        z-index: 1;
+      }
+      .fww-logo {
+        width: 100%;
+      }
+      .api-headline {
+        margin: 0;
+        padding: 0;
+        font-size: 13px;
+        text-transform: uppercase;
+        color: #545885;
+        font-weight: 400;
+        letter-spacing: 0.48rem;
+      }
+      .api-button {
+        margin: 20px 0 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #5afdf2;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        text-decoration: none;
+        text-align: center;
+        color: #19191c;
+        box-shadow: 0 2px 3px 3px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        height: 48px;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+        cursor: pointer;
+        transition: box-shadow 300ms ease-in-out;
+      }
+      @media (min-width: 600px) {
+        .api-content-wrapper {
+          margin: 140px 40px 0 0;
+          align-self: start;
+          width: 50%;
+        }
+        .api-headline {
+          font-size: 15px;
+          letter-spacing: 1.08rem;
+        }
+      }
+      @media (min-width: 960px) {
+        .api-content-wrapper {
+          margin: 240px 60px 0 0;
+          width: 46%;
+        }
+        .api-headline {
+          letter-spacing: 1.08rem;
+        }
+      }
+      @media (min-width: 960px) {
+        .api-main {
+          padding: 22px;
+          margin-top: 80px;
+          margin-bottom: 120px;
+          border-radius: 12px;
+        }
+        .kindal-background {
+          border-radius: 8px;
+        }
+        .api-content-wrapper {
+          margin: 0 120px 0 0;
+          align-self: center;
+          width: 400px;
+        }
+        .api-headline {
+          letter-spacing: 1.1rem;
+        }
+        .api-button:hover {
+          box-shadow: 0 0 0 2px #000, 0 0 0 5px #b44cff;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <main class="api-main">
+      <section class="api-wrapper">
+        <img
+          class="kindal-background"
+          src="./images/kindal-reset-api-home-600x1300.jpg"
+          alt="Kindal getting ready to workout"
+        />
+        <div class="api-content-wrapper">
+          <img
+            class="fww-logo"
+            src="./images/fwwLogo.svg"
+            alt="Fit Womens Weekly Logo"
+          />
+          <h1 class="api-headline">FWW Reset Api</h1>
+          <a class="api-button" href="https://fitwomensweekly.com">Go Home</a>
+        </div>
+      </section>
+    </main>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        const kindalBackground = document.querySelector('.kindal-background')
 
-        try {
-          let app = firebase.app();
-          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+        function mobileDevice(event) {
+          if (event.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-600x1300.jpg'
+            )
+          }
         }
-      });
+
+        function tabletDevice(event) {
+          if (event.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-834x1112.jpg'
+            )
+          }
+        }
+
+        function ipadProDevice(event) {
+          if (event.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-1024x1366.jpg'
+            )
+          }
+        }
+
+        function laptopDevice(event) {
+          if (event.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-1440x900.jpg'
+            )
+          }
+        }
+
+        if (typeof window !== undefined) {
+          const screenWidth = window.innerWidth
+
+          const mobileQuery = window.matchMedia('(max-width: 600px)')
+          const tabletQuery = window.matchMedia('(min-width: 600px)')
+          const ipadProQuery = window.matchMedia('(min-width: 960px)')
+          const laptopQuery = window.matchMedia('(min-width: 1100px)')
+
+          if (mobileQuery.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-600x1300.jpg'
+            )
+          }
+
+          if (tabletQuery.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-834x1112.jpg'
+            )
+          }
+
+          if (ipadProQuery.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-1024x1366.jpg'
+            )
+          }
+
+          if (laptopQuery.matches) {
+            kindalBackground.setAttribute(
+              'src',
+              './images/kindal-reset-api-home-1440x900.jpg'
+            )
+          }
+
+          mobileQuery.addListener(mobileDevice)
+          tabletQuery.addListener(tabletDevice)
+          ipadProQuery.addListener(ipadProDevice)
+          laptopQuery.addListener(laptopDevice)
+
+          window.onclose = function() {
+            mobileQuery.removeListener(mobileDevice)
+            tabletQuery.removeListener(tabletDevice)
+            ipadProQuery.removeListener(ipadProDevice)
+            laptopQuery.removeListener(laptopDevice)
+          }
+        }
+      })
     </script>
   </body>
 </html>
