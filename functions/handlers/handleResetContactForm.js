@@ -23,8 +23,8 @@ exports.handleResetContactForm = (req, res) => {
   // Make the call to email kindal and a general email address too.
 
   const adminMessage = {
-    to: 'kindal@fitwomensweekly.net',
-    from: 'fww@fitwomensweekly.net',
+    to: 'kindal@fitwomensweekly.com',
+    from: 'fww@fitwomensweekly.com',
     templateId: 'd-400748f5b02f4c729f9300d3ee0f6f62',
     dynamic_template_data: {
       firstName: firstName,

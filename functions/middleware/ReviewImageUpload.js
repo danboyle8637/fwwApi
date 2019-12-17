@@ -64,54 +64,66 @@ exports.ReviewImageUpload = (req, res, next) => {
       })
 
       busboy.on('finish', () => {
-        Promise.all(fileWrites)
-          .then(files => {
-            const image = files[0]
-            const tmpFileName = `${userEmailHandle}-300x300-${fileNames[0]}`
-            const tmpFilePath = path.join(tmpdir, tmpFileName)
+        if (fileWrites.length > 0) {
+          Promise.all(fileWrites)
+            .then(files => {
+              const image = files[0]
+              const tmpFileName = `${userEmailHandle}-300x300-${fileNames[0]}`
+              const tmpFilePath = path.join(tmpdir, tmpFileName)
 
-            sharp(image)
-              .jpeg({
-                quality: 60,
-                force: true
-              })
-              .resize(300, 300)
-              .toFile(tmpFilePath)
-              .then(() => {
-                return bucket.upload(tmpFilePath, {
-                  destination: `reviews/${tmpFileName}`,
-                  resumable: false,
-                  uploadType: 'media',
-                  metadata: {
-                    contentType: 'image/jpg',
-                    metadata: {
-                      firebaseStorageDownloadTokens: token
-                    }
-                  }
+              sharp(image)
+                .jpeg({
+                  quality: 60,
+                  force: true
                 })
-              })
-              .then(() => {
-                try {
-                  fs.unlinkSync(tmpFilePath)
-                } catch (error) {
-                  res.status(500).json({
-                    message: 'Could not delete the temp file.'
+                .resize(300, 300)
+                .toFile(tmpFilePath)
+                .then(() => {
+                  return bucket.upload(tmpFilePath, {
+                    destination: `reviews/${tmpFileName}`,
+                    resumable: false,
+                    uploadType: 'media',
+                    metadata: {
+                      contentType: 'image/jpg',
+                      metadata: {
+                        firebaseStorageDownloadTokens: token
+                      }
+                    }
                   })
-                }
+                })
+                .then(() => {
+                  try {
+                    fs.unlinkSync(tmpFilePath)
+                  } catch (error) {
+                    res.status(500).json({
+                      message: 'Could not delete the temp file.'
+                    })
+                  }
 
-                const selfieUrl = `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/reviews%2F${tmpFileName}?alt=media&token=${token}`
+                  const selfieUrl = `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/reviews%2F${tmpFileName}?alt=media&token=${token}`
 
-                req.selfie = {
-                  userId: userId,
-                  selfie: selfieUrl,
-                  review: reviewData
-                }
+                  req.selfie = {
+                    userId: userId,
+                    selfie: selfieUrl,
+                    review: reviewData
+                  }
 
-                next()
-              })
-              .catch(next)
-          })
-          .catch(next)
+                  next()
+                })
+                .catch(next)
+            })
+            .catch(next)
+        } else {
+          const selfieUrl = ''
+
+          req.selfie = {
+            userId: userId,
+            selfie: selfieUrl,
+            review: reviewData
+          }
+
+          next()
+        }
       })
 
       busboy.end(req.rawBody)

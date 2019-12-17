@@ -80,8 +80,8 @@ exports.emailFWWReview = functions.firestore
     const review = docData.review
 
     const emailMessage = {
-      to: 'kindal@fitwomensweekly.net',
-      from: 'fww@fitwomensweekly.net',
+      to: 'kindal@fitwomensweekly.com',
+      from: 'fww@fitwomensweekly.com',
       templateId: 'd-498a71e057cc4926b563e1d59b605427',
       dynamic_template_data: {
         firstName: firstName,
