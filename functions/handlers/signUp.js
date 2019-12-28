@@ -1,7 +1,7 @@
 const db = require('../utils/admin').db
 const auth = require('../utils/admin').auth
 
-const config = require('../fbconfig')
+const { prodConfig } = require('../fbconfig')
 const {
   checkIsEmail,
   checkIsEmpty,
@@ -78,8 +78,8 @@ exports.signUp = (req, res) => {
   auth.getUser(cleanUserInfo.userId).then(userCredential => {
     // Step 2: Does user already exist?
     const userId = userCredential.uid
-    const baseAvatarImage = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media`
-    const baseAvatarImageTiny = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar-tiny.jpg?alt=media`
+    const baseAvatarImage = `https://firebasestorage.googleapis.com/v0/b/${prodConfig.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media`
+    const baseAvatarImageTiny = `https://firebasestorage.googleapis.com/v0/b/${prodConfig.storageBucket}/o/admin%2Ffww-user-avatar-tiny.jpg?alt=media`
 
     db.collection('users')
       .doc(cleanUserInfo.userId)

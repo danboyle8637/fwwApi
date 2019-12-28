@@ -7,11 +7,11 @@ const sharp = require('sharp')
 const Busboy = require('busboy')
 const uuid = require('uuid/v4')
 
-const config = require('../fbconfig')
+const { prodConfig } = require('../fbconfig')
 
 exports.ReviewImageUpload = (req, res, next) => {
   const userId = req.userId
-  const bucket = storage.bucket(config.storageBucket)
+  const bucket = storage.bucket(prodConfig.storageBucket)
   const busboy = new Busboy({ headers: req.headers })
   const token = uuid()
   const tmpdir = os.tmpdir()
