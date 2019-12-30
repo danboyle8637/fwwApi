@@ -7,11 +7,11 @@ const sharp = require('sharp')
 const Busboy = require('busboy')
 const uuid = require('uuid/v4')
 
-const { prodConfig } = require('../fbconfig')
+const { config } = require('../fbconfig')
 
 exports.ReviewImageUpload = (req, res, next) => {
   const userId = req.userId
-  const bucket = storage.bucket(prodConfig.storageBucket)
+  const bucket = storage.bucket(config.storageBucket)
   const busboy = new Busboy({ headers: req.headers })
   const token = uuid()
   const tmpdir = os.tmpdir()
@@ -100,7 +100,7 @@ exports.ReviewImageUpload = (req, res, next) => {
                     })
                   }
 
-                  const selfieUrl = `https://firebasestorage.googleapis.com/v0/b/fit-womens-weekly.appspot.com/o/reviews%2F${tmpFileName}?alt=media&token=${token}`
+                  const selfieUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/reviews%2F${tmpFileName}?alt=media&token=${token}`
 
                   req.selfie = {
                     userId: userId,

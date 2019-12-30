@@ -21,7 +21,7 @@ exports.Authorize = (req, res, next) => {
         req.userId = decodedToken.uid
         return next()
       })
-      .catch(error => {
+      .catch(() => {
         return res
           .status(403)
           .json({ error: 'You did not pass authorization.' })

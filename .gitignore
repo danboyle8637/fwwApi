@@ -18,7 +18,9 @@ node_modules/
 .vscode/
 firebase.json
 fbconfig.js
+fbconfig-dev.js
 functions/service-account.json
+functions/service-account-dev.json
 
 # Firebase config
 
@@ -74,3 +76,4 @@ node_modules/
 
 # dotenv environment variables file
 .env
+.env.dev
