@@ -1,0 +1,19 @@
+{
+  "name": "fwwresetapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "firebase deploy --only functions,hosting:reset-api-fit-womens-weekly"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danboyle8637/fwwApi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danboyle8637/fwwApi/issues"
+  },
+  "homepage": "https://github.com/danboyle8637/fwwApi#readme"
+}
