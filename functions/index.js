@@ -36,6 +36,7 @@ const {
 const {
   emergencySocialCompleteSignUp
 } = require('./handlers/emergencySocialCreateUserData')
+const { addFierceWorkouts } = require('./helperFunctions/addFierceWorkouts')
 
 const app = express()
 
@@ -63,6 +64,8 @@ app.post('/add-reset-reviewer', ckAddReviewer)
 app.post('/reset-contact-form', handleResetContactForm)
 app.post('/emergency-create-user', emergencyCompleteSignUp)
 app.post('/emergency-social-create-user', emergencySocialCompleteSignUp)
+
+app.post('/add-fierce-workout', addFierceWorkouts)
 
 // This is my REST-ish app for talking to my database
 exports.api = functions.https.onRequest(app)
