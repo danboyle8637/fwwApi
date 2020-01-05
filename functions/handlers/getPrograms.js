@@ -10,27 +10,30 @@ exports.getPrograms = (req, res) => {
     programIdArray: data.programIdArray
   }
 
-  const activeProgramArray = request.programIdArray
+  const usersPrograms = request.programIdArray
 
   db.collection('programs')
     .get()
     .then(docsArray => {
-      let programArray = []
+      let programsArray = []
 
       docsArray.forEach(doc => {
         const data = doc.data()
-        programArray.push(data)
+        programsArray.push(data)
       })
 
-      const sortedPrograms = activeProgramArray.reduce(
+      // The whole purpose of this is to reorder the programs
+      // This puts the active programs first
+      // * accumulator is active user programs
+      const activePrograms = usersPrograms.reduce(
         (accumulator, currentValue) => {
-          programArray.forEach(program => {
+          programsArray.forEach(program => {
             if (program.programId === currentValue) {
               accumulator.push(program)
             }
           })
 
-          programArray = programArray.filter(
+          programsArray = programsArray.filter(
             program => program.programId !== currentValue
           )
 
@@ -39,11 +42,22 @@ exports.getPrograms = (req, res) => {
         []
       )
 
-      const sortedProgramsArray = [...sortedPrograms, ...programArray]
+      programsArray.sort((a, b) => {
+        if (a.price > b.price) {
+          return -1
+        } else {
+          return 1
+        }
+      })
+
+      const purchasedPrograms = [...activePrograms]
+
+      const notPurchasedPrograms = [...programsArray]
 
       return res.status(200).json({
         message: 'Here are your programs',
-        programs: sortedProgramsArray
+        purchasedPrograms: purchasedPrograms,
+        notPurchasedPrograms: notPurchasedPrograms
       })
     })
     .catch(error => {

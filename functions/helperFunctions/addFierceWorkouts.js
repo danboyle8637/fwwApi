@@ -20,7 +20,7 @@ exports.addFierceWorkouts = (req, res) => {
     workoutVideos: data.workoutVideos
   }
 
-  db.collection('fierce')
+  db.collection('programs')
     .doc('FierceStrong')
     .collection('workouts')
     .doc('TwoSided')
