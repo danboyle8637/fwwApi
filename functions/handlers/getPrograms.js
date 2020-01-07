@@ -42,6 +42,7 @@ exports.getPrograms = (req, res) => {
         []
       )
 
+      // This ensures the Fierce programs are listed first
       programsArray.sort((a, b) => {
         if (a.price > b.price) {
           return -1
