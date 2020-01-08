@@ -5,7 +5,7 @@ const {
   checkIsEmail,
   checkIsEmpty,
   cleanAndCheckUsername,
-  formatNames
+  formatSocialName
 } = require('../utils/formatValidate')
 
 exports.signUpSocialAccount = (req, res) => {
@@ -26,7 +26,7 @@ exports.signUpSocialAccount = (req, res) => {
   const isFirstNameEmpty = checkIsEmpty(request.firstName)
   const isBiggestObstacleEmpty = checkIsEmpty(request.biggestObstacle)
   const isEmailValid = checkIsEmail(request.email)
-  const formattedFirstName = formatNames(request.firstName)
+  const formattedFirstName = formatSocialName(request.firstName)
   const formattedUsername = cleanAndCheckUsername(request.username)
 
   if (isFirstNameEmpty) {
@@ -109,7 +109,6 @@ exports.signUpSocialAccount = (req, res) => {
           programs: [cleanUserInfo.programId],
           biggestObstacle: cleanUserInfo.biggestObstacle,
           photoUrl: cleanUserInfo.photoUrl,
-          photoUrlTiny: '',
           createdAt: new Date().toLocaleDateString()
         }
 
@@ -152,7 +151,6 @@ exports.signUpSocialAccount = (req, res) => {
           message: '💪 Account Created. Congrats!',
           firstName: cleanUserInfo.firstName,
           photoUrl: cleanUserInfo.photoUrl,
-          photoUrlTiny: '',
           programs: programsArray
         })
       })

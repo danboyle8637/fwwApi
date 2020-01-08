@@ -53,3 +53,10 @@ exports.formatNames = name => {
   const restOfName = name.slice(1)
   return capitalize + restOfName
 }
+
+exports.formatSocialName = name => {
+  const firstName = name.trim().split(' ')[0]
+  const capitalize = firstName.charAt(0).toUpperCase()
+  const restOfName = firstName.slice(1)
+  return capitalize + restOfName
+}
