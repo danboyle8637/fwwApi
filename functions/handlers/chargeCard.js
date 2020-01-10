@@ -28,8 +28,6 @@ exports.chargeCard = (req, res) => {
     .then(docSnapshot => {
       const email = docSnapshot.data().email
 
-      console.log(email)
-
       stripe.charges
         .create({
           amount: amount,
@@ -43,6 +41,24 @@ exports.chargeCard = (req, res) => {
           }
         })
         .then(status => {
+          // TODO Add the program to users program array... have email address.
+
+          // * Step 1 - Have programId and email address
+
+          // * Step 2 - Get users program array in a holding array
+
+          // * Step 3 - Get the total workouts from the program
+
+          // * Step 4 - Set data in user's program for percent complete
+
+          // * Step 5 - Set up Convert Kit correctly
+
+          // * Step 6 - Update program array in database and holding array to send back to client
+
+          // * Step 7 - For practice, update Custom Claims
+
+          // * Step 8 - Send back the users updated programs Array
+
           res.status(200).json({
             message: status
           })
