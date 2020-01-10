@@ -57,7 +57,9 @@ exports.chargeCard = (req, res) => {
 
           // * Step 7 - For practice, update Custom Claims
 
-          // * Step 8 - Send back the users updated programs Array
+          // * Step 8 - Recreate the add Programs functionality into a separate function so you can reuse it.
+
+          // * You need to send back updated purchased and not purchased programs arrays for client update.
 
           res.status(200).json({
             message: status
