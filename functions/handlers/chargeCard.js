@@ -14,7 +14,7 @@ exports.chargeCard = (req, res) => {
     token: data.token
   }
 
-  const userId = 'eMQP8iUAVwWAK70xoL6ZYtTibeG2'
+  const userId = req.userId
   const firstName = request.firstName
   const programId = request.programId
   const amount = request.amount * 100
