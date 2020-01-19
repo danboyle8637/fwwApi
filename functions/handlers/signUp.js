@@ -1,3 +1,6 @@
+require('dotenv').config({
+  path: `.env`
+})
 const db = require('../utils/admin').db
 const auth = require('../utils/admin').auth
 
@@ -78,8 +81,13 @@ exports.signUp = (req, res) => {
   auth.getUser(cleanUserInfo.userId).then(userCredential => {
     // Step 2: Does user already exist?
     const userId = userCredential.uid
-    const baseAvatarImage = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media`
-    const baseAvatarImageTiny = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar-tiny.jpg?alt=media`
+
+    const developmentUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media&token=23b76010-2636-417c-9e37-ce3e51039aec`
+
+    const productionUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/admin%2Ffww-user-avatar.png?alt=media&token=06a57f33-c4f7-4096-94ba-e9cc6239b7b2`
+
+    const baseAvatarImage =
+      process.env.API_STAGE === 'development' ? developmentUrl : productionUrl
 
     db.collection('users')
       .doc(cleanUserInfo.userId)
@@ -176,7 +184,6 @@ exports.signUp = (req, res) => {
           success: `💪 Account created. Congrats!`,
           firstName: cleanUserInfo.firstName,
           photoUrl: baseAvatarImage,
-          photoUrlTiny: baseAvatarImageTiny,
           programs: programArray
           // initialSetup: true,
         })
