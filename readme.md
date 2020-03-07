@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="150" src="https://www.dropbox.com/s/w6b4fzuxw7i71b5/fww-readme-logo.jpg">
+  <img width="150" src="https://www.dropbox.com/s/w6b4fzuxw7i71b5/fww-readme-logo.jpg?raw=1">
 </p>
 
 # Fit Women's Weekly Reset API
