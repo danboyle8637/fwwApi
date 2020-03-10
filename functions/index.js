@@ -31,6 +31,9 @@ const { ckAddReviewer } = require('./handlers/ckAddReviewer')
 const { handleResetContactForm } = require('./handlers/handleResetContactForm')
 const { handleFWWContactPage } = require('./convertKit/handleFWWContactPage')
 const {
+  caseDownloadTrackingSheetVote
+} = require('./handlers/castDownloadTrackingSheetVote')
+const {
   emergencyCompleteSignUp
 } = require('./handlers/emergencyCreateUserData')
 const {
@@ -62,6 +65,7 @@ app.post('/not-finish-reset-signup', ckNotFinishResetSignUp)
 app.post('/add-member-to-convertkit', ckAddResetMember)
 app.post('/add-reset-reviewer', ckAddReviewer)
 app.post('/reset-contact-form', handleResetContactForm)
+app.post('/cast-download-tracking-sheet-vote', caseDownloadTrackingSheetVote)
 app.post('/emergency-create-user', emergencyCompleteSignUp)
 app.post('/emergency-social-create-user', emergencySocialCompleteSignUp)
 app.post('/charge', Authorize, chargeCard)

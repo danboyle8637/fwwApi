@@ -36,12 +36,8 @@ exports.postComplete = (req, res) => {
       .update({
         workoutsCompleted: increment
       })
-      .then(() => {
-        console.log('Increment successful!')
-      })
-      .catch(error => {
-        console.log(error)
-      })
+      .then(() => {})
+      .catch(() => {})
   }
 
   workoutStats
@@ -54,7 +50,6 @@ exports.postComplete = (req, res) => {
 
       // Should be if(!completed1) {Do updates}
       if (completeId === 1) {
-        console.log('Should be updating only Complete1')
         workoutStats
           .update({
             'completed.complete1.isComplete': true,
@@ -77,7 +72,6 @@ exports.postComplete = (req, res) => {
           })
       }
       if (completeId === 2 && completed1) {
-        console.log('Should be updating only Complete2')
         workoutStats
           .update({
             'completed.complete2.isComplete': true,
@@ -103,7 +97,6 @@ exports.postComplete = (req, res) => {
         })
       }
       if (completeId === 3 && completed2) {
-        console.log('Should be updating only Complete3')
         workoutStats
           .update({
             'completed.complete3.isComplete': true,
