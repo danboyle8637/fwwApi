@@ -2,7 +2,7 @@ require('dotenv').config({
   path: `.env`
 })
 const db = require('../utils/admin').db
-const stripe = require('stripe')(process.env.STRIPE_TEST_SECRET)
+const stripe = require('stripe')(process.env.STRIPE_LIVE_SECRET)
 
 exports.chargeCard = (req, res) => {
   const data = JSON.parse(req.body)
