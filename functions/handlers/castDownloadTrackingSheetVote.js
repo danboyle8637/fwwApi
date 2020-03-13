@@ -9,31 +9,37 @@ exports.caseDownloadTrackingSheetVote = (req, res) => {
   const incrementYes = admin.firestore.FieldValue.increment(1)
   const incrementNo = admin.firestore.FieldValue.increment(-1)
 
+  const counterDoc = db.collection('appData').doc('fwwReset')
+
   if (userVote === 'yes') {
-    db.collection('appData')
-      .doc('fwwReset')
-      .update({
-        shouldDownloadTrackingSheets: incrementYes
-      })
+    counterDoc
+      .update({ shouldDownloadTrackingSheets: incrementYes })
       .then(() => {
-        return res.status(201).json({
+        res.status(201).json({
           message: `Thanks 💕`
+        })
+      })
+      .catch(() => {
+        res.status(500).json({
+          message: 'Server error. Try again!'
         })
       })
   } else if (userVote === 'no') {
-    db.collection('appData')
-      .doc('fwwReset')
-      .update({
-        shouldDownloadTrackingSheets: incrementNo
-      })
+    counterDoc
+      .update({ shouldDownloadTrackingSheets: incrementNo })
       .then(() => {
-        return res.status(201).json({
+        res.status(201).json({
           message: `Thanks 💕`
         })
       })
+      .catch(() => {
+        res.status(500).json({
+          message: 'Server error. Try again!'
+        })
+      })
   } else {
-    return res.status(400).json({
-      message: 'Invalid vote 🤔'
+    res.status(500).json({
+      message: 'Server error. Try again!'
     })
   }
 }
