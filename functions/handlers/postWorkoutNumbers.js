@@ -57,7 +57,7 @@ exports.postWorkoutNumbers = (req, res) => {
       } else if (!Object.keys(data.trackingStats).includes('third')) {
         saveThirdNumber()
       } else {
-        res.status(200).json({
+        return res.status(200).json({
           message: `Sorry we currently don't support more than three data points. Would you want more?`
         })
       }
@@ -80,12 +80,12 @@ exports.postWorkoutNumbers = (req, res) => {
       })
       .then(() => {
         handleIncrementWorkoutsCompleted()
-        res.status(200).json({
+        return res.status(200).json({
           message: `Success 💪`
         })
       })
       .catch(error => {
-        res.status(400).json({
+        return res.status(400).json({
           message: 'Error try again 😭',
           error: error
         })
@@ -101,12 +101,12 @@ exports.postWorkoutNumbers = (req, res) => {
         'completed.complete2.timestamp': timestamp
       })
       .then(() => {
-        res.status(200).json({
+        return res.status(200).json({
           message: `Success 💪`
         })
       })
       .catch(error => {
-        res.status(400).json({
+        return res.status(400).json({
           message: 'Error try again 😭',
           error: error
         })
@@ -122,12 +122,12 @@ exports.postWorkoutNumbers = (req, res) => {
         'completed.complete3.timestamp': timestamp
       })
       .then(() => {
-        res.status(200).json({
+        return res.status(200).json({
           message: `Success 💪`
         })
       })
       .catch(error => {
-        res.status(400).json({
+        return res.status(400).json({
           message: 'Error try again 😭',
           error: error
         })

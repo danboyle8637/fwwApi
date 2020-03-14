@@ -22,13 +22,13 @@ exports.getWorkouts = (req, res) => {
         workoutsArray.push(workoutData)
       })
 
-      res.status(200).json({
+      return res.status(200).json({
         message: 'Workouts retrieved.',
         workouts: workoutsArray
       })
     })
     .catch(error => {
-      res.status(500).json({
+      return res.status(500).json({
         message:
           '😢 Seems like the network was down or there was a server error. Reload the page and try again. If it keeps happening, contact us to let us know.',
         error: error

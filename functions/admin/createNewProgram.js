@@ -51,12 +51,12 @@ exports.createNewProgram = (req, res) => {
     .doc(programId)
     .set(program)
     .then(() => {
-      res.status(201).json({
+      return res.status(201).json({
         message: `Success! ${name} setup correctly in the database`
       })
     })
     .catch(() => {
-      res.status(500).json({
+      return res.status(500).json({
         message: `Error. Could not write data to database.`
       })
     })

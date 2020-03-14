@@ -80,12 +80,12 @@ exports.emergencySocialCompleteSignUp = (req, res) => {
             if (result.status === 200) {
               emergencyConvertKitSignUp(cleanUserData)
                 .then(() => {
-                  res.status(200).json({
+                  return res.status(200).json({
                     message: 'Account created!'
                   })
                 })
                 .catch(error => {
-                  res.status(500).json({
+                  return res.status(500).json({
                     message: `Could not get you signed up to our member email list. Don't miss out on member updates and specials. Email us so we can make sure you are set up correctly.`,
                     error: error.message
                   })
@@ -93,7 +93,7 @@ exports.emergencySocialCompleteSignUp = (req, res) => {
             }
           })
           .catch(error => {
-            res.status(500).json({
+            return res.status(500).json({
               message:
                 'There was an error getting your account created. Please contact us so we can help make sure you are set up correctly. Sorry for the issue.',
               error: error
@@ -102,12 +102,12 @@ exports.emergencySocialCompleteSignUp = (req, res) => {
       } else if (inFirestore && !inConvertKit) {
         emergencyConvertKitSignUp(cleanUserData)
           .then(() => {
-            res.status(200).json({
+            return res.status(200).json({
               message: 'Account added!'
             })
           })
           .catch(error => {
-            res.status(500).json({
+            return res.status(500).json({
               message: `Could not get you signed up to our member email list. Don't miss out on member updates and specials. Email us so we can make sure you are set up correctly.`,
               error: error.message
             })
@@ -115,25 +115,25 @@ exports.emergencySocialCompleteSignUp = (req, res) => {
       } else if (!inFirestore && inConvertKit) {
         emergencyFirestoreSignUp(cleanUserData)
           .then(() => {
-            res.status(200).json({
+            return res.status(200).json({
               message: 'Account setup in database!'
             })
           })
           .catch(() => {
-            res.status(500).json({
+            return res.status(500).json({
               message:
                 'There was an error getting your account created. Please contact us so we can help make sure you are set up correctly. Sorry for the issue.'
             })
           })
       } else {
-        res.status(400).json({
+        return res.status(400).json({
           message:
             'You should never be reading this message. If you are, please contact us immediately!'
         })
       }
     })
     .catch(() => {
-      res.status(500).json({
+      return res.status(500).json({
         message: `Network issues kept us from setting up your account correctly. Contact us and we'll help you get setup so you can workout!`
       })
     })

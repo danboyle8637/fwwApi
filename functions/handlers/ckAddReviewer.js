@@ -20,7 +20,7 @@ exports.ckAddReviewer = (req, res) => {
   const listTagsUrl = `${baseUrl}/tags?api_key=${apiKey}`
 
   if (!isEmail) {
-    res.end()
+    return res.end()
   }
 
   fetch(listTagsUrl, {

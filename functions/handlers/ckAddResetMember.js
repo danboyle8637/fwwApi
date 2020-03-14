@@ -66,14 +66,14 @@ exports.ckAddResetMember = (req, res) => {
       })
         .then(response => response.json())
         .then(() => {
-          res.status(200).json({
+          return res.status(200).json({
             message: `Added to ${program} tag`
           })
         })
         .catch(() => {})
     })
     .catch(() => {
-      res.status(500).json({
+      return res.status(500).json({
         message: 'Could not add to our list'
       })
     })

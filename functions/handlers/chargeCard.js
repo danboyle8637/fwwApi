@@ -41,18 +41,18 @@ exports.chargeCard = (req, res) => {
           }
         })
         .then(status => {
-          res.status(200).json({
+          return res.status(200).json({
             message: status
           })
         })
         .catch(error => {
-          res.status(500).json({
+          return res.status(500).json({
             message: error
           })
         })
     })
     .catch(error => {
-      res.status(500).json({
+      return res.status(500).json({
         message:
           'Could not access your FWW account to complete your purchase. Try again!',
         error

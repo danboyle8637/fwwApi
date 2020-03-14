@@ -120,13 +120,13 @@ exports.setupWorkoutTracking = (req, res) => {
           return accumulator
         }, {})
 
-        res.status(200).json({
+        return res.status(200).json({
           message: 'Stats retrieved',
           stats: stats
         })
       })
       .catch(error => {
-        res.status(404).json({
+        return res.status(404).json({
           message:
             '😢 Either a server or network error has stopped us from getting your workout stats. Refresh to try again or let us know if this keeps happening.',
           error: error
