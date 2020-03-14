@@ -19,11 +19,9 @@ exports.getUser = (req, res) => {
           programs: userData.programs
         })
       } else {
-        auth.deleteUser(userId).then(() => {
-          return res.status(400).json({
-            message: `Not a member yet. Sign up. It's free!`,
-            error: 'not-member'
-          })
+        return res.status(400).json({
+          message: `Not a member yet. Sign up. It's free!`,
+          error: 'not-member'
         })
       }
     })
