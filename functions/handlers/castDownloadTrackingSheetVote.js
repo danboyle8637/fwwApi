@@ -15,12 +15,12 @@ exports.caseDownloadTrackingSheetVote = (req, res) => {
     counterDoc
       .update({ shouldDownloadTrackingSheets: incrementYes })
       .then(() => {
-        res.status(201).json({
+        return res.status(201).json({
           message: `Thanks 💕`
         })
       })
       .catch(() => {
-        res.status(500).json({
+        return res.status(500).json({
           message: 'Server error. Try again!'
         })
       })
@@ -28,17 +28,17 @@ exports.caseDownloadTrackingSheetVote = (req, res) => {
     counterDoc
       .update({ shouldDownloadTrackingSheets: incrementNo })
       .then(() => {
-        res.status(201).json({
+        return res.status(201).json({
           message: `Thanks 💕`
         })
       })
       .catch(() => {
-        res.status(500).json({
+        return res.status(500).json({
           message: 'Server error. Try again!'
         })
       })
   } else {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Server error. Try again!'
     })
   }

@@ -97,7 +97,7 @@ exports.handleWorkoutTracking = (req, res) => {
 
     Promise.all(workoutDocPromises)
       .then(() => {
-        res.json({
+        return res.json({
           message: 'Workout tracking successfully setup'
         })
         //sendBackWorkoutTracking()
@@ -154,14 +154,14 @@ exports.handleWorkoutTracking = (req, res) => {
           }
           return accumulator
         }, {})
-        res.status(200).json({
+        return res.status(200).json({
           message: 'Stats successfully retrieved',
           percentComplete: percentComplete,
           stats: stats
         })
       })
       .catch(error => {
-        res.status(404).json({
+        return res.status(404).json({
           message: 'Could not get workouts stats. Please try again.',
           error: error
         })

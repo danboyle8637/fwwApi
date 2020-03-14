@@ -7,6 +7,7 @@ const cors = require('cors')
 const sgMail = require('@sendgrid/mail')
 
 const { Authorize } = require('./middleware/Authorize')
+const { AuthorizeAdmin } = require('./middleware/AuthorizeAdmin')
 const { signUp } = require('./handlers/signUp')
 const { signUpSocialAccount } = require('./handlers/signUpSocialAccount')
 const { getUser } = require('./handlers/getUser')
@@ -40,6 +41,8 @@ const {
   emergencySocialCompleteSignUp
 } = require('./handlers/emergencySocialCreateUserData')
 const { chargeCard } = require('./handlers/chargeCard')
+const { createNewProgram } = require('./admin/createNewProgram')
+const { createNewWorkout } = require('./admin/createNewWorkout')
 
 const app = express()
 
@@ -69,6 +72,10 @@ app.post('/cast-download-tracking-sheet-vote', caseDownloadTrackingSheetVote)
 app.post('/emergency-create-user', emergencyCompleteSignUp)
 app.post('/emergency-social-create-user', emergencySocialCompleteSignUp)
 app.post('/charge', Authorize, chargeCard)
+
+// Admin endpoints
+app.post('/create-new-program', AuthorizeAdmin, createNewProgram)
+app.post('/create-new-workout', AuthorizeAdmin, createNewWorkout)
 
 // This is my REST-ish app for talking to my database
 exports.api = functions.https.onRequest(app)

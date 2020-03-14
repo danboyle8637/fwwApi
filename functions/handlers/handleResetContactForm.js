@@ -50,12 +50,12 @@ exports.handleResetContactForm = (req, res) => {
 
   Promise.all([admin, user])
     .then(() => {
-      res.status(200).json({
+      return res.status(200).json({
         message: 'Your message was sent! 💪'
       })
     })
     .catch(() => {
-      res.status(200).json({
+      return res.status(200).json({
         message: `Message didn't send 😬. Try again!`
       })
     })
