@@ -15,13 +15,15 @@ exports.getUser = (req, res) => {
 
         return res.status(200).json({
           message: 'Successfully got user',
+          error: false,
           firstName: userData.firstName,
           programs: userData.programs
         })
       } else {
-        return res.status(400).json({
-          message: `Not a member yet. Sign up. It's free!`,
-          error: 'not-member'
+        auth.deleteUser(userId)
+        return res.status(404).json({
+          message: `User not found. Please sign up and create an account. It's free!`,
+          error: true
         })
       }
     })
