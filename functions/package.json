@@ -24,7 +24,7 @@
     "node-fetch": "^2.6.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
-    "sharp": "^0.23.3",
+    "sharp": "^0.30.5",
     "stripe": "^7.15.0",
     "uuid": "^3.3.3"
   },
